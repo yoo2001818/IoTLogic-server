@@ -21,28 +21,33 @@ export const User = {
   }
 };
 
-export const Article = {
+export const Device = {
+  name: {
+    is: {
+      key: 'DEVICE_NAME_POLICY',
+      // It's okay as long as it is a valid Scheme symbol
+      value: /([^\s#()[\]'`0-9;"'.,]|\\x[0-9a-fA-F]+)([^\s#()[\]'`;"'])*$/
+    },
+    len: {
+      key: 'FIELD_TOO_LONG',
+      value: [1, 32]
+    },
+    notEmpty: true
+  },
+  alias: {
+    len: {
+      key: 'FIELD_TOO_LONG',
+      value: [0, 48]
+    }
+  }
+};
+
+export const Document = {
   name: {
     len: {
       key: 'FIELD_TOO_LONG',
-      value: [0, 256]
-    },
-    notEmpty: true
-  },
-  photo: {
-    isURL: true
-  },
-  description: {
-    len: {
-      key: 'FIELD_TOO_LONG',
-      value: [0, 32767]
-    },
-    notEmpty: true
-  },
-  price: {
-    isInt: {
-      key: 'FIELD_INT_ONLY'
+      value: [1, 48]
     },
     notEmpty: true
   }
-}
+};
