@@ -38,20 +38,18 @@ export const User = {
 };
 
 export const Password = {
-  password: {
-    is: {
-      key: 'AUTH_PASSWORD_POLICY',
-      // It's numbers and non-numbers. :P
-      value: /^(?=.*[^0-9])(?=.*[0-9]).*$/
-    },
-    len: {
-      key: 'AUTH_PASSWORD_SHORT',
-      value: [6]
-    },
-    notEmpty: {
-      key: 'FIELD_REQUIRED',
-      value: true
-    }
+  is: {
+    key: 'AUTH_PASSWORD_POLICY',
+    // It's numbers and non-numbers. :P
+    value: /^(?=.*[^0-9])(?=.*[0-9]).*$/
+  },
+  len: {
+    key: 'AUTH_PASSWORD_SHORT',
+    value: [6]
+  },
+  notEmpty: {
+    key: 'FIELD_REQUIRED',
+    value: true
   }
 };
 

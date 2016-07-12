@@ -57,6 +57,9 @@ Result: 400, 409, 200
 
 Result: 400, 401, 200
 
+- username
+- password
+
 ### Logout
 
 `DELETE /api/user`
@@ -77,6 +80,9 @@ Result: 400, 401, 200
 `POST /api/user/password`
 
 Result: 400, 401, 200
+
+- password
+- newPassword
 
 ### Deactivate
 

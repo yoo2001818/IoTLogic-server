@@ -14,5 +14,13 @@ export default {
   validation: {
     id: 'VALIDATION_ERROR',
     message: 'The data you\'ve provided has a validation error.'
+  },
+  invalidUsername: {
+    id: 'INVALID_USERNAME',
+    message: 'User with specified username does not exist.'
+  },
+  invalidPassword: {
+    id: 'INVALID_PASSWORD',
+    message: 'The specified password is incorrect.'
   }
 };
