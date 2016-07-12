@@ -1,0 +1,24 @@
+.side-navigation {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  & > li > a {
+    display: block;
+    padding: 0.8rem 0.6rem;
+    padding-left: 2rem;
+    margin: 0 0.5rem;
+    color: $sidebar-menu-color;
+    font-size: 1.1em;
+    text-decoration: none;
+    box-sizing: border-box;
+    &:hover {
+      background-color: $sidebar-hover-bg-color;
+    }
+    &.active {
+      background-color: $sidebar-active-bg-color;
+      color: $sidebar-active-fg-color;
+    }
+  }
+  & > li:last-child > a {
+  }
+}

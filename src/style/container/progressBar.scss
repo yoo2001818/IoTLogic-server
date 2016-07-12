@@ -1,0 +1,38 @@
+#loadCover {
+  position: fixed;
+  top: 0;
+}
+
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 0.3rem;
+  background-color: #BDDFFF;
+  opacity: 0;
+  transition: opacity 0s linear 0.5s;
+  z-index: 10000;
+}
+
+#loader.enabled {
+  opacity: 1;
+  transition: opacity 0s linear;
+}
+
+#loader .filling {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #0056B3;
+  transition: width 0.5s linear;
+}
+
+#loader.started .filling {
+  transition: width 0s linear;
+}
+
+#loader .percentage {
+  display: none;
+}
