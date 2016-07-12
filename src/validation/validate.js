@@ -63,7 +63,12 @@ export default function validate(data, schema) {
 export function validateSingle(data, schema) {
   let result = validate(data, schema);
   for (let key in result) {
-    if (result[key] !== false) return result[key];
+    if (result[key] !== false) {
+      return {
+        field: key,
+        type: result[key]
+      };
+    }
   }
   return null;
 }

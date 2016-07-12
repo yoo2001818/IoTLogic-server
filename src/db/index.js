@@ -8,9 +8,14 @@ export { sequelize };
 export const User = sequelize.define('user', inject({
   username: {
     type: Sequelize.STRING,
-    unique: true
+    unique: true,
+    allowNull: false
   },
-  email: Sequelize.STRING,
+  email: {
+    type: Sequelize.STRING,
+    unique: true,
+    allowNull: false
+  },
   password: Sequelize.STRING,
   name: Sequelize.STRING,
   isAdmin: {

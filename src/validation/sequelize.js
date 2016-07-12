@@ -5,7 +5,10 @@ function createValidation(validation) {
   for (let key in validation) {
     let value = validation[key];
     if (value.value) {
-      newValidation[key] = value.value;
+      newValidation[key] = {
+        args: value.value,
+        msg: value.key
+      };
     } else {
       newValidation[key] = value;
     }

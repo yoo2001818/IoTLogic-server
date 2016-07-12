@@ -46,6 +46,11 @@ Result: 401, 200
 
 Result: 400, 409, 200
 
+- username
+- name
+- email
+- password
+
 ### Login
 
 `POST /api/user/login`
@@ -57,6 +62,15 @@ Result: 400, 401, 200
 `DELETE /api/user`
 
 Result: 401, 200
+
+### Set profile
+
+`POST /api/user`
+
+Result: 400, 401, 200
+
+- name
+- email
 
 ### Change password
 

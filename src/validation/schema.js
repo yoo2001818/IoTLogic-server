@@ -14,10 +14,44 @@ export const User = {
         'help', 'about', 'contact', 'administrator', 'starred', 'notification',
         'form']
     },
-    notEmpty: true
+    notEmpty: {
+      key: 'FIELD_REQUIRED',
+      value: true
+    }
+  },
+  name: {
+    len: {
+      key: 'FIELD_TOO_LONG',
+      value: [0, 32]
+    }
   },
   email: {
-    isEmail: true
+    isEmail: {
+      key: 'FIELD_EMAIL_REQUIRED',
+      value: true
+    },
+    notEmpty: {
+      key: 'FIELD_REQUIRED',
+      value: true
+    }
+  }
+};
+
+export const Password = {
+  password: {
+    is: {
+      key: 'AUTH_PASSWORD_POLICY',
+      // It's numbers and non-numbers. :P
+      value: /^(?=.*[^0-9])(?=.*[0-9]).*$/
+    },
+    len: {
+      key: 'AUTH_PASSWORD_SHORT',
+      value: [6]
+    },
+    notEmpty: {
+      key: 'FIELD_REQUIRED',
+      value: true
+    }
   }
 };
 
@@ -32,7 +66,10 @@ export const Device = {
       key: 'FIELD_TOO_LONG',
       value: [1, 32]
     },
-    notEmpty: true
+    notEmpty: {
+      key: 'FIELD_REQUIRED',
+      value: true
+    }
   },
   alias: {
     len: {
@@ -48,6 +85,9 @@ export const Document = {
       key: 'FIELD_TOO_LONG',
       value: [1, 48]
     },
-    notEmpty: true
+    notEmpty: {
+      key: 'FIELD_REQUIRED',
+      value: true
+    }
   }
 };

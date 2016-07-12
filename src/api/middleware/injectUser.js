@@ -2,7 +2,7 @@ import { User } from '../../db';
 
 function setUser(user) {
   this.user = user;
-  this.session.userId = user.id;
+  this.session.userId = user && user.id;
 }
 
 export default function injectUser(req, res, next) {

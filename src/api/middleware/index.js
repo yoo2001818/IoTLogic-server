@@ -4,6 +4,7 @@ import authConfig from '../../../config/auth.config';
 import { sequelize } from '../../db';
 import sequelizeStore from 'connect-session-sequelize';
 import injectUser from './injectUser';
+import expressPromise from 'express-promise';
 import Express from 'express';
 
 const SequelizeStore = sequelizeStore(session.Store);
@@ -23,4 +24,5 @@ router.use(session({
   saveUninitialized: false,
   store: sessionStore
 }));
+router.use(expressPromise());
 router.use(injectUser);
