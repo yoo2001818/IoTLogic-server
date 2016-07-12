@@ -5,6 +5,7 @@ import MessageServer from './messageServer';
 import apiRouter from './api';
 import logging from './util/logging';
 import errorCode from './util/errorCode';
+import serveStatic from 'serve-static';
 
 import networkConfig from '../config/network.config';
 
@@ -17,8 +18,40 @@ const app = express();
 app.use(logging);
 app.use('/api', apiRouter);
 
-app.all('/', (req, res) => {
-  res.send('IoTLogic central messaging server');
+if (__DEVELOPMENT__) {
+  const webpackDevMiddleware = require('webpack-dev-middleware');
+  const webpackHotMiddleware = require('webpack-hot-middleware');
+  const webpack = require('webpack');
+  const webpackConfig = require('../webpack.config.js');
+  let compiler = webpack(webpackConfig);
+  app.use(webpackHotMiddleware(compiler));
+  app.use(webpackDevMiddleware(compiler, {
+    noInfo: true,
+    publicPath: '/assets'
+  }));
+} else {
+  app.use('/assets', serveStatic('./dist'));
+}
+
+app.get('/favicon.ico', (req, res) => {
+  res.sendStatus(404);
+});
+
+app.use((req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta charset="UTF-8">
+        <title>IoTLogic</title>
+      </head>
+      <body>
+        <script src="/assets/bundle.js"></script>
+      </body>
+    </html>
+  `);
 });
 
 app.use(function(err, req, res, next) { // eslint-disable-line

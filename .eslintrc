@@ -36,10 +36,17 @@
     "curly": [
       2,
       "multi-line"
-    ]
+    ],
+    "react/prop-types": 1,
+    "react/jsx-uses-react": 2,
+    "react/jsx-uses-vars": 2,
+    "react/react-in-jsx-scope": 2
   },
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
   "env": {
     "es6": true,
@@ -47,5 +54,15 @@
     "browser": true,
     "mocha": true
   },
-  "extends": "eslint:recommended"
+  "plugins": [
+    "react"
+  ],
+  "extends": "eslint:recommended",
+  "globals": {
+    "__SERVER__": true,
+    "__CLIENT__": true,
+    "__DEVELOPMENT__": true,
+    "__DEVTOOLS__": true,
+    "__WEBPACK_ISOMORPHIC_TOOLS__": true
+  }
 }
