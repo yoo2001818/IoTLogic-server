@@ -5,19 +5,40 @@ import FullOverlay from '../component/ui/fullOverlay';
 import Dialog from '../component/ui/dialog';
 import Button from '../component/ui/button';
 
-import { dismiss } from '../action/error';
+import { errorDismiss } from '../action/load';
 import __ from '../lang';
 
 class ErrorOverlay extends Component {
+  componentDidMount() {
+    this.handleFocus();
+  }
+  componentDidUpdate() {
+    this.handleFocus();
+  }
+  handleFocus() {
+    const { error } = this.props;
+    if (!error) return;
+    console.log(this.dismissBtn);
+    this.dismissBtn.focus();
+  }
   render() {
-    const { enabled, message, stack, type, dismiss } = this.props;
-    if (!enabled) return false;
+    const { errorDismiss, error } = this.props;
+    if (!error) return false;
+    let errorMsg = error.body;
+    // Sometimes server returns JSON object as an error, so we'll have to
+    // do this to display an error message. Otherwise, it'll just return
+    // [Object object], which is pretty bad for debugging.
+    // Or, we could use JSON.stringify? I think that's pretty bad though.
+    if (error.body.message) {
+      errorMsg = error.body.message;
+    }
     return (
       <FullOverlay filter>
         <Dialog title={__('ErrorTitle')}>
-          <p>{message + ' @ ' + type}</p>
-          <code><pre>{stack}</pre></code>
-          <Button onClick={dismiss}>{__('Dismiss')}</Button>
+          <p>{errorMsg + ' @ ' + error.type}</p>
+          <Button onClick={errorDismiss} ref={ref => this.dismissBtn = ref}>
+            {__('Dismiss')}
+          </Button>
         </Dialog>
       </FullOverlay>
     );
@@ -25,11 +46,10 @@ class ErrorOverlay extends Component {
 }
 
 ErrorOverlay.propTypes = {
-  enabled: PropTypes.bool.isRequired,
-  dismiss: PropTypes.func.isRequired,
-  message: PropTypes.string,
-  stack: PropTypes.string,
-  type: PropTypes.string
+  errorDismiss: PropTypes.func.isRequired,
+  error: PropTypes.object
 };
 
-export default connect(state => state.error, { dismiss })(ErrorOverlay);
+export default connect(
+  state => state.load,
+  { errorDismiss })(ErrorOverlay);

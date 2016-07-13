@@ -10,7 +10,7 @@ import __ from '../../lang';
 
 class LoginForm extends Component {
   handleSubmit(values) {
-    return this.props.onLogin(values)
+    return this.props.onLogin(values, {errors: [401]})
     .then(action => {
       if (!action.error) return;
       if (action.payload.body.id === 'INVALID_USERNAME') {

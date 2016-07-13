@@ -7,7 +7,7 @@ import AppContainer from '../container/appContainer';
 import __ from '../lang';
 
 import ProgressBar from '../container/progressBar';
-// import ErrorOverlay from '../container/errorOverlay';
+import ErrorOverlay from '../container/errorOverlay';
 
 class App extends Component {
   componentWillMount() {
@@ -24,6 +24,7 @@ class App extends Component {
             {this.props.children}
           </AppContainer>
         </div>
+        <ErrorOverlay />
         <ProgressBar />
       </div>
     );
