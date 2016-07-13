@@ -1,13 +1,12 @@
-import * as SessionActions from '../action/session.js';
-import { loadFilter } from './load.js';
+import * as UserActions from '../action/user';
+import { loadFilter } from './load';
 
-const loadReducer = loadFilter(SessionActions);
+const loadReducer = loadFilter(UserActions);
 
-export default function session(state = {
+export default function user(state = {
   load: undefined,
   loaded: false,
-  login: null,
-  method: null
+  username: null
 }, action) {
   const load = loadReducer(state.load, action);
   const newState = Object.assign({}, state, {
@@ -15,24 +14,24 @@ export default function session(state = {
   });
   let { method } = state;
   const { type, payload, meta, error } = action;
-  let login;
-  if (payload) login = payload.result;
+  let username;
+  if (payload) username = payload.result;
   switch (type) {
-  case SessionActions.FETCH:
+  case UserActions.FETCH:
     // If we have an error in this, we should consider this a fatal error
     if (error && payload.status !== 401) {
       return Object.assign({}, state, {error: true, loaded: true});
     }
     return Object.assign({}, newState, {
       loaded: true,
-      login: error ? null : login
+      username: error ? null : username
     });
-  case SessionActions.LOGIN:
+  case UserActions.LOGIN:
     if (error) return state;
     return Object.assign({}, newState, {
-      login
+      username
     });
-  case SessionActions.SIGNUP_FINALIZE:
+  /*case SessionActions.SIGNUP_FINALIZE:
     if (error) return state;
     return Object.assign({}, newState, {
       login
@@ -62,7 +61,7 @@ export default function session(state = {
           inUse: false
         })
       })
-    });
+    });*/
   }
   return newState;
 }

@@ -5,11 +5,12 @@ export default class Button extends Component {
     if (this.props.onClick) this.props.onClick(event);
   }
   render() {
-    const { children } = this.props;
+    const { children, disabled } = this.props;
     return (
       <button
         className='button-component'
         onClick={this.handleClick.bind(this)}
+        disabled={disabled}
       >
         {children}
       </button>
@@ -19,5 +20,6 @@ export default class Button extends Component {
 
 Button.propTypes = {
   children: PropTypes.node,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  disabled: PropTypes.boolean
 };

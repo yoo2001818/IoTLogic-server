@@ -26,4 +26,7 @@
     background-color: $blue-700;
     // border-color: darken($color, 10%);
   }
+  &:disabled, &:disabled:hover, &:disabled:active {
+    background-color: $grey-700;
+  }
 }

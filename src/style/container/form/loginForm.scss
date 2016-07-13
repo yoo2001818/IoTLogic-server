@@ -1,0 +1,27 @@
+.login-form {
+  & > .content {
+    margin-bottom: 0.5em;
+    & > div {
+      margin-bottom: 0.5em;
+    }
+  }
+  & > .action {
+    width: 100%;
+    button {
+      display: block;
+      width: 100%;
+      margin: 0;
+    }
+    & > .register {
+      text-align: right;
+      margin-top: 0.5em;
+      font-size: 0.85em;
+      a {
+        color: $grey-700;
+      }
+    }
+  }
+  &.dialog {
+    max-width: 20em;
+  }
+}

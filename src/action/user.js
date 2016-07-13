@@ -1,79 +1,58 @@
+// Session related actions come here
 import { createAction } from 'redux-actions';
-import { api, GET, POST } from '../middleware/api.js';
-import { User } from '../schema/index.js';
+import { User } from '../schema/index';
+import { api, GET, POST, DELETE } from '../middleware/api';
 
-export const FETCH = 'USER_FETCH';
-export const SET_PROFILE = 'USER_SET_PROFILE';
-export const SET_ENABLED = 'USER_SET_ENABLED';
-export const SET_EMAIL = 'USER_SET_EMAIL';
-export const UPLOAD_PHOTO = 'USER_UPLOAD_PHOTO';
+export const FETCH = 'user/fetch';
+export const REGISTER = 'user/register';
+export const LOGIN = 'user/login';
+export const LOGOUT = 'user/logout';
+export const SET_PROFILE = 'user/setProfile';
+export const CHANGE_PASSWORD = 'user/changePassword';
 
 export const fetch = createAction(FETCH,
-  username => api(GET, `/users/${username}`),
-  username => ({
-    replace: {
-      users: {
-        [username.toLowerCase()]: null
-      }
-    },
-    errors: [404],
-    schema: User
-  })
-);
-
-export const setEnabled = createAction(SET_ENABLED,
-  (username, enabled) => api(POST, `/users/${username}/enabled`, {
-    body: { enabled }
-  }),
+  () => api(GET, '/user', {}),
   () => ({
-    errors: [404],
+    errors: [401],
     schema: User
-  })
-);
+  }));
+export const register = createAction(REGISTER,
+  credentials => api(POST, '/user/register', {
+    body: credentials
+  }),
+  (_, meta) => Object.assign({}, meta, {
+    schema: User
+  }));
+export const login = createAction(LOGIN,
+  credentials => api(POST, '/user/login', {
+    body: credentials
+  }),
+  (_, meta) => Object.assign({}, meta, {
+    schema: User
+  }));
+export const logout = createAction(LOGOUT,
+  () => api(DELETE, '/user', {}),
+  (_, meta) => meta);
 
 export const setProfile = createAction(SET_PROFILE,
-  (username, data) => api(POST, `/users/${username}`, {
-    body: data
+  credentials => api(POST, '/user', {
+    body: credentials
   }),
-  () => ({
-    errors: [404],
+  (_, meta) => Object.assign({}, meta, {
     schema: User
   })
 );
-
-export const setEmail = createAction(SET_EMAIL,
-  (username, data) => api(POST, `/users/${username}/email`, {
-    body: data
+export const changePassword = createAction(CHANGE_PASSWORD,
+  credentials => api(POST, '/user/password', {
+    body: credentials
   }),
-  () => ({
-    errors: [404],
-    schema: User
-  })
+  (_, meta) => meta
 );
 
-export const uploadPhoto = createAction(UPLOAD_PHOTO,
-  (username, file) => api(POST, `/users/${username}/photo`, {
-    body: {
-      x: 0,
-      y: 0,
-      size: 1000
-    },
-    files: {
-      photo: file
-    }
-  }),
-  () => ({
-    schema: User
-  })
-);
-
-export function load(username = '') {
+export function load() {
   return (dispatch, getState) => {
-    const { entities: { users } } = getState();
-    const user = users[username.toLowerCase()];
-    if (user == null || user.id == null) {
-      return dispatch(fetch(username));
-    }
+    const user = getState().user;
+    if (!user.loaded) return dispatch(fetch());
     return Promise.resolve();
   };
 }
