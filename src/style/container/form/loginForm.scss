@@ -6,10 +6,10 @@
     }
   }
   & > .action {
+    margin-top: 1em;
     width: 100%;
     button {
-      display: block;
-      width: 100%;
+      display: inline-block;
       margin: 0;
     }
     & > .register {
@@ -22,6 +22,6 @@
     }
   }
   &.dialog {
-    max-width: 20em;
+    max-width: 19em;
   }
 }

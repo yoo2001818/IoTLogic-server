@@ -18,7 +18,7 @@
         box-shadow: none;
       }
       &.error > input, &.valid > input, &.asyncValidating > .indicator {
-        padding-right: 1.4rem;
+        padding-right: 1.8rem;
       }
       &.error > .indicator {
         display: block;
@@ -51,7 +51,7 @@
         line-height: 1rem;
         margin-top: -0.5rem;
         width: 1rem;
-        right: 0.2rem;
+        right: 0.5rem;
         font-size: 0.9em;
       }
     }

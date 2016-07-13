@@ -1,26 +1,29 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+
+import { fetch } from '../action/user';
 
 import AppContainer from '../container/appContainer';
-import LoginKeeper from '../container/loginKeeper';
 import __ from '../lang';
 
 import ProgressBar from '../container/progressBar';
 // import ErrorOverlay from '../container/errorOverlay';
 
-export default class App extends Component {
+class App extends Component {
+  componentWillMount() {
+    this.props.fetch();
+  }
   render() {
     // Just a mockup..
     return (
       <div id='app'>
-        <LoginKeeper>
-          <div className='app-wrapper'>
-            <AppContainer
-              title={__('IoTLogicTitle')}
-            >
-              {this.props.children}
-            </AppContainer>
-          </div>
-        </LoginKeeper>
+        <div className='app-wrapper'>
+          <AppContainer
+            title={__('IoTLogicTitle')}
+          >
+            {this.props.children}
+          </AppContainer>
+        </div>
         <ProgressBar />
       </div>
     );
@@ -28,5 +31,8 @@ export default class App extends Component {
 }
 
 App.propTypes = {
-  children: PropTypes.node
+  children: PropTypes.node,
+  fetch: PropTypes.func
 };
+
+export default connect(null, { fetch })(App);
