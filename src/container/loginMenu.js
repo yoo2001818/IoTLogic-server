@@ -1,23 +1,27 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
+
+import { logout } from '../action/user';
 
 import __ from '../lang';
 
 import DropDown from '../component/ui/dropDown';
 
-export default class LoginMenu extends Component {
+class LoginMenu extends Component {
   handleLogout(e) {
     const { logout } = this.props;
     logout();
     e.preventDefault();
   }
   render() {
-    if (true) { // ...
+    const { user } = this.props;
+    if (user == null) { // ...
       // Show login link
       return (
         <div className='login-menu anonymous'>
           <div className='action'>
-            <Link to='/login'>{__('Login')}</Link>
+            <Link to='/'>{__('Login')}</Link>
           </div>
         </div>
       );
@@ -26,7 +30,7 @@ export default class LoginMenu extends Component {
       <div className='login-menu guest'>
         <div className='user-info'>
           <DropDown href='#' title={(
-            "Derp"
+            user.name || user.username
           )}>
             <ul className='menu-list'>
               <li>
@@ -43,6 +47,10 @@ export default class LoginMenu extends Component {
 }
 
 LoginMenu.propTypes = {
-  connection: PropTypes.object,
+  user: PropTypes.object,
   logout: PropTypes.func
 };
+
+export default connect(state => ({
+  user: state.entities.users[state.user.username]
+}), { logout })(LoginMenu);
