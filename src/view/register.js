@@ -19,7 +19,7 @@ class Register extends Component {
       <FullOverlay>
         <Dialog title={__('RegisterTitle')}>
           { username == null ? (
-            <RegisterForm onRegister={register} />
+            <RegisterForm onRegister={register} className='dialog' />
           ) : (
             <div>
               <p>{__('AlreadyLoggedDesc')}</p>

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import classNames from 'classnames';
 import { browserHistory } from 'react-router';
+import { Link } from 'react-router';
 
 import { User, Password } from '../../validation/schema';
 import validate from '../../validation/validate';
@@ -51,6 +52,9 @@ class RegisterForm extends Component {
             <Button onClick={onSubmit} button disabled={invalid}>
               {__('RegisterBtn')}
             </Button>
+            <div className='register'>
+              <Link to='/'>{__('Back')}</Link>
+            </div>
           </div>
         </div>
       </form>
