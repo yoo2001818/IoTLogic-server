@@ -13,7 +13,7 @@ class ErrorAlert extends Component {
     return (
       <Alert>
         {typeof error === 'string' ? ( error ) : (
-          __(error.name, error.values)
+          __(error.name, error.value)
         )}
       </Alert>
     );
@@ -25,10 +25,27 @@ ErrorAlert.propTypes = {
     PropTypes.string,
     PropTypes.shape({
       name: PropTypes.string,
-      argument: PropTypes.any
+      value: PropTypes.any
     })
   ])
 };
+
+const InputProps = [
+  // HTML attributes
+  'placeholder',
+  'type',
+  'value',
+  // Event listeners
+  'onBlur',
+  'onChange',
+  'onFocus'
+];
+
+function filterProps(props) {
+  let obj = {};
+  InputProps.forEach(v => obj[v] = props[v]);
+  return obj;
+}
 
 export default class ErrorInput extends Component {
   render() {
@@ -45,7 +62,7 @@ export default class ErrorInput extends Component {
             valid: showValid && valid && touched && !asyncValidating,
             asyncValidating
           })}>
-            <TextInput {...this.props} />
+            <TextInput {...filterProps(this.props)} />
             <div className='indicator' />
           </span>
         </label>

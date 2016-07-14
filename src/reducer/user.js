@@ -12,7 +12,6 @@ export default function user(state = {
   const newState = Object.assign({}, state, {
     load
   });
-  let { method } = state;
   const { type, payload, meta, error } = action;
   let username;
   if (payload) username = payload.result;
@@ -31,6 +30,14 @@ export default function user(state = {
     return Object.assign({}, newState, {
       username
     });
+  case UserActions.REGISTER:
+    if (error) return state;
+    return Object.assign({}, newState, {
+      username
+    });
+  case UserActions.LOGOUT:
+    if (error) return state;
+    return { load, loaded: true, username: null };
   /*case SessionActions.SIGNUP_FINALIZE:
     if (error) return state;
     return Object.assign({}, newState, {
@@ -45,9 +52,6 @@ export default function user(state = {
         })
       })
     });
-  case SessionActions.LOGOUT:
-    if (error) return state;
-    return { load, loaded: true, method, login: null };
   case SessionActions.METHOD_FETCH:
     if (error) return state;
     return Object.assign({}, newState, {

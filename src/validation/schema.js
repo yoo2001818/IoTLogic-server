@@ -1,37 +1,37 @@
 export const User = {
   username: {
     is: {
-      key: 'AUTH_USERNAME_POLICY',
+      key: 'ErrorValidationUsernamePolicy',
       value: /^[a-zA-Z0-9]+$/
     },
     len: {
-      key: 'FIELD_TOO_LONG',
+      key: 'ErrorValidationMaxLength',
       value: [1, 32]
     },
     notIn: {
-      key: 'FIELD_RESERVED',
+      key: 'ErrorValidationUsernameReserved',
       value: ['login', 'signup', 'search', 'settings', 'new', 'admin', 'root',
         'help', 'about', 'contact', 'administrator', 'starred', 'notification',
         'form']
     },
     notEmpty: {
-      key: 'FIELD_REQUIRED',
+      key: 'ErrorValidationRequired',
       value: true
     }
   },
   name: {
     len: {
-      key: 'FIELD_TOO_LONG',
+      key: 'ErrorValidationMaxLength',
       value: [0, 32]
     }
   },
   email: {
     isEmail: {
-      key: 'FIELD_EMAIL_REQUIRED',
+      key: 'ErrorValidationEmail',
       value: true
     },
     notEmpty: {
-      key: 'FIELD_REQUIRED',
+      key: 'ErrorValidationRequired',
       value: true
     }
   }
@@ -39,16 +39,16 @@ export const User = {
 
 export const Password = {
   is: {
-    key: 'AUTH_PASSWORD_POLICY',
+    key: 'ErrorValidationPasswordPolicy',
     // It's numbers and non-numbers. :P
     value: /^(?=.*[^0-9])(?=.*[0-9]).*$/
   },
   len: {
-    key: 'AUTH_PASSWORD_SHORT',
+    key: 'ErrorValidationMinLength',
     value: [6]
   },
   notEmpty: {
-    key: 'FIELD_REQUIRED',
+    key: 'ErrorValidationRequired',
     value: true
   }
 };
@@ -56,22 +56,22 @@ export const Password = {
 export const Device = {
   name: {
     is: {
-      key: 'DEVICE_NAME_POLICY',
+      key: 'ErrorValidationDevicePolicy',
       // It's okay as long as it is a valid Scheme symbol
       value: /([^\s#()[\]'`0-9;"'.,]|\\x[0-9a-fA-F]+)([^\s#()[\]'`;"'])*$/
     },
     len: {
-      key: 'FIELD_TOO_LONG',
+      key: 'ErrorValidationMaxLength',
       value: [1, 32]
     },
     notEmpty: {
-      key: 'FIELD_REQUIRED',
+      key: 'ErrorValidationRequired',
       value: true
     }
   },
   alias: {
     len: {
-      key: 'FIELD_TOO_LONG',
+      key: 'ErrorValidationMaxLength',
       value: [0, 48]
     }
   }
@@ -80,11 +80,11 @@ export const Device = {
 export const Document = {
   name: {
     len: {
-      key: 'FIELD_TOO_LONG',
+      key: 'ErrorValidationMaxLength',
       value: [1, 48]
     },
     notEmpty: {
-      key: 'FIELD_REQUIRED',
+      key: 'ErrorValidationRequired',
       value: true
     }
   }

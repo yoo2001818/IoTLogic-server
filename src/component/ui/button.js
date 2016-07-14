@@ -11,6 +11,7 @@ export default class Button extends Component {
         className='button-component'
         onClick={this.handleClick.bind(this)}
         disabled={disabled}
+        ref={v => this.button = v}
       >
         {children}
       </button>
@@ -21,5 +22,5 @@ export default class Button extends Component {
 Button.propTypes = {
   children: PropTypes.node,
   onClick: PropTypes.func,
-  disabled: PropTypes.boolean
+  disabled: PropTypes.bool
 };

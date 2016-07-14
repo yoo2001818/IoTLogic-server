@@ -18,8 +18,7 @@ class ErrorOverlay extends Component {
   handleFocus() {
     const { error } = this.props;
     if (!error) return;
-    console.log(this.dismissBtn);
-    this.dismissBtn.focus();
+    this.dismissBtn.button.focus();
   }
   render() {
     const { errorDismiss, error } = this.props;

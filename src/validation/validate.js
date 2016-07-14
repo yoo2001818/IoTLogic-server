@@ -8,11 +8,9 @@ function normalizeValidation(validation) {
   };
 }
 
-function runValidation(key, validation, value) {
-  if (validation == null) return null;
+function runValidation(key, args, value) {
   // currently only supports:
   // is, isURL, isEmail, len, notEmpty, notIn
-  let args = normalizeValidation(validation);
   switch (key) {
   case 'is':
     if (!validator.matches(value, args.value)) return args.key;
@@ -43,16 +41,25 @@ function runValidation(key, validation, value) {
 }
 
 // Run validations from the data
-export default function validate(data, schema) {
+export default function validate(data, schema, detailed = false) {
   if (schema == null) return {};
   let errors = {};
   for (let key in schema) {
     let validation = schema[key];
     let value = data[key];
     for (let check in validation) {
-      const result = runValidation(check, validation[check], value);
+      if (validation[check] == null) continue;
+      let args = normalizeValidation(validation[check]);
+      const result = runValidation(check, args, value || '');
       if (result !== null) {
-        errors[key] = result;
+        if (detailed) {
+          errors[key] = {
+            name: result,
+            value: args.value
+          };
+        } else {
+          errors[key] = result;
+        }
       }
     }
   }
