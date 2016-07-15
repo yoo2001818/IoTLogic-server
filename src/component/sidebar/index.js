@@ -14,7 +14,9 @@ export default class Sidebar extends Component {
           onTouchStart={onClose}
         />
         <div className='sidebar-root'>
-          {children}
+          <div className='container'>
+            {children}
+          </div>
         </div>
       </div>
     );

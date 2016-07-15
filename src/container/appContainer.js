@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-
 import { open, close, toggle } from '../action/sidebar';
 
 import Header from '../component/header';
+import SidebarHeader from '../component/header/sidebar';
 import Sidebar from '../component/sidebar';
 
 import LoginMenu from './loginMenu';
@@ -16,6 +16,7 @@ class AppContainer extends Component {
       isOpen, close, toggle } = this.props;
     return (
       <div className='app-container'>
+        <div className='headers'>
         <Header
           onSidebar={toggle.bind(null, null)}
           showSidebar={isOpen}
@@ -27,13 +28,17 @@ class AppContainer extends Component {
             </div>
           )}
         />
+        </div>
         <div className='wrapper'>
           <Sidebar
             visible={isOpen}
             onClose={close.bind(null, null)}
           >
-            <SideNavigation />
-            { sidebar }
+            <SidebarHeader left='메뉴' />
+            <div className='content'>
+              <SideNavigation />
+              { sidebar }
+            </div>
           </Sidebar>
           <div className='content'>
             { children }

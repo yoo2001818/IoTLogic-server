@@ -8,14 +8,15 @@ import __ from '../lang';
 class SideNavigation extends Component {
   render() {
     return (
-      <Entry hideHeader noPadding>
+      <Entry hideHeader>
         <ul className='side-navigation'>
           <li>
             <IndexLink activeClassName='active' to='/'>
-              {__('RoomListTitle')}
+              {__('IndexTitle')}
             </IndexLink>
           </li>
-          <li><a>{__('ProfileTitle')}</a></li>
+          <li><a>{__('DevicesTitle')}</a></li>
+          <li><a>{__('DocumentsTitle')}</a></li>
         </ul>
       </Entry>
     );

@@ -1,0 +1,48 @@
+.sidebar-header-component {
+  $headerColor: #fff;
+  position: absolute;
+  top: -$header-height;
+  height: $header-height;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: $sidebar-header-bg-color;
+  // box-shadow: 0 0.2rem 4px -1px rgba(#000, 0.25);
+  border-bottom: 1px solid $sidebar-header-border-color;
+  color: $sidebar-header-color;
+  font-size: $header-font-size;
+  line-height: $header-height;
+  vertical-align: middle;
+  box-sizing: border-box;
+  a {
+    color: $header-color;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  & > .content {
+    box-sizing: border-box;
+    padding: 0 2rem;
+    margin: 0 auto;
+    text-align: center;
+    & > .left {
+      display: inline-block;
+      float: left;
+    }
+    & > .center {
+      position: absolute;
+      display: inline-block;
+      text-align: center;
+    }
+    & > .right {
+      display: inline-block;
+      float: right;
+    }
+  }
+  // Landscape and keyboard is out, At least users should be able to see
+  // what they are typing.
+  @media screen and (max-height: 5em) {
+    visibility: hidden;
+  }
+}

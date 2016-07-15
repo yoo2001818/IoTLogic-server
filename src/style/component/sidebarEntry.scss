@@ -1,7 +1,6 @@
 .sidebar-entry {
   border-radius: 3px;
-  padding: 1em;
-  margin: 0.5rem 0;
+  padding: 0;
   & > .header {
     h1 {
       margin: 0;
@@ -11,8 +10,5 @@
       color: $sidebar-title-color;
     }
     margin-bottom: 0.7em;
-  }
-  &.no-padding {
-    padding: 0.5em 0;
   }
 }

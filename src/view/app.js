@@ -19,7 +19,7 @@ class App extends Component {
       <div id='app'>
         <div className='app-wrapper'>
           <AppContainer
-            title={__('IoTLogicTitle')}
+            title={__('IndexTitle')}
           >
             {this.props.children}
           </AppContainer>

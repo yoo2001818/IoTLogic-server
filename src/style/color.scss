@@ -56,12 +56,17 @@ $header-title-color: $green-100;
 $header-color: $green-200;
 $header-border-color: $green-800;
 
-$sidebar-color: $bg-color;
-$sidebar-border-color: $grey-300;
+$sidebar-header-bg-color: $grey-100;
+$sidebar-header-color: $grey-700;
+$sidebar-header-border-color: $grey-500;
+
+$sidebar-color: $grey-100;
+$sidebar-border-color: $grey-500;
 $sidebar-overlay-color: rgba(#000, 0.5);
 
 $sidebar-title-color: $grey-600;
 $sidebar-menu-color: $grey-700;
-$sidebar-hover-bg-color: $grey-200;
-$sidebar-active-fg-color: $orange-700;
-$sidebar-active-bg-color: $grey-200;
+$sidebar-hover-fg-color: $blue-800;
+$sidebar-hover-bg-color: $blue-200;
+$sidebar-active-fg-color: $blue-100;
+$sidebar-active-bg-color: $blue-600;

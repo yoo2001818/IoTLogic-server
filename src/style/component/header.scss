@@ -2,7 +2,6 @@
   $headerColor: #fff;
   position: fixed;
   top: 0;
-  left: 0;
   right: 0;
   height: $header-height;
   z-index: 1000;
@@ -13,6 +12,17 @@
   font-size: $header-font-size;
   line-height: $header-height;
   vertical-align: middle;
+  left: $sidebar-width + $sidebar-margin;
+  box-sizing: border-box;
+  @media screen and (max-width: $tablet-size) {
+    left: 0;
+    transition: left 0.2s;
+    white-space: nowrap;
+    width: 100vw;
+    &.open {
+      left: $sidebar-width + $sidebar-margin;
+    }
+  }
   a {
     color: $header-color;
     text-decoration: none;
@@ -56,6 +66,7 @@
       }
     }
     & > .center {
+      position: absolute;
       display: inline-block;
       text-align: center;
     }
