@@ -4,8 +4,8 @@ import loginRequired from './lib/loginRequired';
 import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
 import { User } from '../db';
-import { Password } from '../validation/schema';
-import { validateSingle } from '../validation/validate';
+import { Password } from '../../validation/schema';
+import { validateSingle } from '../../validation/validate';
 
 const router = new Express.Router();
 export default router;

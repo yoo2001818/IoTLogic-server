@@ -7,7 +7,7 @@ import logging from './util/logging';
 import errorCode from './util/errorCode';
 import serveStatic from 'serve-static';
 
-import networkConfig from '../config/network.config';
+import networkConfig from '../../config/network.config';
 
 const production = process.env.NODE_ENV === 'production';
 
@@ -22,7 +22,7 @@ if (__DEVELOPMENT__) {
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackHotMiddleware = require('webpack-hot-middleware');
   const webpack = require('webpack');
-  const webpackConfig = require('../webpack.config.js');
+  const webpackConfig = require('../../webpack.config.js');
   let compiler = webpack(webpackConfig);
   app.use(webpackHotMiddleware(compiler));
   app.use(webpackDevMiddleware(compiler, {

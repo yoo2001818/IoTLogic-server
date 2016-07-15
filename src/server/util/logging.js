@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import morgan from 'morgan';
 
-import loggingConfig from '../../config/log.config';
+import loggingConfig from '../../../config/log.config';
 
 import Express from 'express';
 

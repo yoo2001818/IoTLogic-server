@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import { browserHistory } from 'react-router';
 import { Link } from 'react-router';
 
-import { User, Password } from '../../validation/schema';
-import validate from '../../validation/validate';
+import { User, Password } from '../../../validation/schema';
+import validate from '../../../validation/validate';
 
 import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';

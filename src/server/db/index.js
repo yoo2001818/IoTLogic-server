@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
-import sequelize from './init.js';
-import * as validations from '../validation/schema.js';
-import inject from '../validation/sequelize.js';
+import sequelize from './init';
+import * as validations from '../../validation/schema';
+import inject from '../../validation/sequelize';
 
 export { sequelize };
 

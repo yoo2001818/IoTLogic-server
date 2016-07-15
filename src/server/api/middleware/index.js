@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import session from 'express-session';
-import authConfig from '../../../config/auth.config';
+import authConfig from '../../../../config/auth.config';
 import { sequelize } from '../../db';
 import sequelizeStore from 'connect-session-sequelize';
 import injectUser from './injectUser';
