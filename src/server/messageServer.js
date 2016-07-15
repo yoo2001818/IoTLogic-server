@@ -1,16 +1,38 @@
 import { Environment, Router } from 'iotlogic-core';
 import { WebSocketServerConnector } from 'locksmith-connector-ws';
 
+import { Device } from './db';
+
 export default class MessageServer {
   constructor(server) {
     this.connector = new WebSocketServerConnector({
       server,
       verifyClient: (info, cb) => {
-        console.log(info);
-        cb(true);
+        let token = info.req.url.slice(1);
+        // TODO server -> client push notification (with websocket)
+        Device.findOne({ where: { token } })
+        .then(device => {
+          if (device == null) {
+            cb(false, 401, 'Unauthorized');
+            return;
+          }
+          info.req.device = device;
+          cb(true);
+        }, error => {
+          console.log(error);
+          cb(false, 500, 'Internal server error');
+        });
       }
     });
-    this.router = new Router(this.connector, true);
+    this.router = new Router(this.connector, true, (_, clientId) => {
+      // Ignore data from the client; We've already loaded device info
+      let data = this.connector.clients[clientId].upgradeReq.device.toJSON();
+      console.log(data);
+      // :P
+      for (let key in this.router.synchronizers) {
+        this.router.synchronizers[key].handleConnect(data, clientId);
+      }
+    });
     this.router.on('error', err => {
       console.log((err && err.stack) || err);
     });
@@ -39,7 +61,7 @@ export default class MessageServer {
     });
 
     this.router.addSynchronizer('main', environment.synchronizer);
-    
+
     this.connector.start();
   }
 }
