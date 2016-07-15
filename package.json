@@ -38,23 +38,7 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.12.1"
-  },
-  "dependencies": {
-    "bcryptjs": "^2.3.0",
-    "body-parser": "^1.15.2",
-    "classnames": "^2.2.5",
-    "connect-session-sequelize": "^3.1.0",
-    "express": "^4.14.0",
-    "express-promise": "^0.4.0",
-    "express-session": "^1.14.0",
-    "flux-standard-action": "^0.6.1",
-    "font-awesome": "^4.6.3",
-    "history": "^3.0.0",
-    "iotlogic-core": "^0.1.1",
-    "mkdirp": "^0.5.1",
-    "morgan": "^1.7.0",
-    "normalizr": "^2.1.0",
+    "webpack-hot-middleware": "^2.12.1",
     "react": "^15.2.1",
     "react-dom": "^15.2.1",
     "react-redux": "^4.4.5",
@@ -66,8 +50,25 @@
     "redux-form": "^5.3.1",
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.1.0",
+    "superagent": "^2.0.0",
+    "history": "^3.0.0",
+    "classnames": "^2.2.5",
+    "flux-standard-action": "^0.6.1",
+    "font-awesome": "^4.6.3",
+    "normalizr": "^2.1.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.3.0",
+    "body-parser": "^1.15.2",
+    "connect-session-sequelize": "^3.1.0",
+    "express": "^4.14.0",
+    "express-promise": "^0.4.0",
+    "express-session": "^1.14.0",
+    "iotlogic-core": "^0.1.1",
+    "mkdirp": "^0.5.1",
+    "morgan": "^1.7.0",
+    "randomstring": "^1.1.5",
     "sequelize": "^3.23.4",
-    "serve-static": "^1.11.1",
-    "superagent": "^2.0.0"
+    "serve-static": "^1.11.1"
   }
 }

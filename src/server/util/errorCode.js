@@ -22,5 +22,9 @@ export default {
   invalidPassword: {
     id: 'INVALID_PASSWORD',
     message: 'The specified password is incorrect.'
+  },
+  noSuchDevice: {
+    id: 'NO_SUCH_DEVICE',
+    message: 'Device with specified name does not exist.'
   }
 };

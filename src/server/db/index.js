@@ -56,14 +56,30 @@ export const Device = sequelize.define('device', inject({
   },
   alias: Sequelize.STRING,
   // We don't know what's gonna be in there
-  type: Sequelize.STRING,
+  type: {
+    type: Sequelize.STRING,
+    allowNull: false
+  },
   data: Sequelize.TEXT,
-  token: Sequelize.STRING
+  token: {
+    type: Sequelize.STRING,
+    allowNull: false,
+    unique: true
+  }
 }, validations.Device), {
   indexes: [{
     unique: true,
     fields: ['name', 'userId']
-  }]
+  }],
+  instanceMethods: {
+    toJSON: function() {
+      let obj = this.get({
+        plain: true
+      });
+      delete obj.token;
+      return obj;
+    }
+  }
 });
 
 export const Document = sequelize.define('document', inject({

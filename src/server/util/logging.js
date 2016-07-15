@@ -18,8 +18,8 @@ if (loggingConfig.stdout != null) {
 // Set up access logger
 if (loggingConfig.access != null) {
   let options = loggingConfig.access;
-  mkdirp.sync(path.resolve(__dirname, '../../', options.directory));
-  let stream = fs.createWriteStream(path.resolve(__dirname, '../../',
-    options.directory, options.filename));
+  mkdirp.sync(path.resolve(__dirname, '../../../', options.directory));
+  let stream = fs.createWriteStream(path.resolve(__dirname, '../../../',
+    options.directory, options.filename), { flags: 'a' });
   router.use(morgan(options.format, {stream}));
 }
