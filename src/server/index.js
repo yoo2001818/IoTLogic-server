@@ -15,6 +15,9 @@ const httpServer = http.createServer();
 const messageServer = new MessageServer(httpServer);
 const app = express();
 
+app.set('x-powered-by', false);
+app.locals.messageServer = messageServer;
+
 app.use(logging);
 app.use('/api', apiRouter);
 

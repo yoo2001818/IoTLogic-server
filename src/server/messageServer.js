@@ -5,6 +5,8 @@ import { Device } from './db';
 
 export default class MessageServer {
   constructor(server) {
+    this.dbClients = {};
+    this.socketClients = {};
     this.connector = new WebSocketServerConnector({
       server,
       verifyClient: (info, cb) => {
@@ -28,6 +30,13 @@ export default class MessageServer {
       // Ignore data from the client; We've already loaded device info
       let data = this.connector.clients[clientId].upgradeReq.device.toJSON();
       console.log(data);
+      // TODO We should push notification to web clients
+      // Also, multiprocess load-balancing would require Redis or something
+      // to share the socket status (This is same for the messaging server!)
+
+      // TODO Refactor this client table?
+      this.dbClients[data.id] = clientId;
+      this.socketClients[clientId] = data.id;
       // :P
       for (let key in this.router.synchronizers) {
         this.router.synchronizers[key].handleConnect(data, clientId);
@@ -39,7 +48,13 @@ export default class MessageServer {
     this.router.on('connect', () => {
       console.log('Connected!');
     });
-    this.router.on('disconnect', () => {
+    this.router.on('disconnect', (name, clientId) => {
+      if (name === true) {
+        let deviceId = this.socketClients[clientId];
+        // TODO Push notification
+        delete this.dbClients[deviceId];
+        delete this.socketClients[clientId];
+      }
       console.log('Disconnected!');
     });
     this.router.on('freeze', () => {
