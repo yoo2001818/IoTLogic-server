@@ -26,5 +26,13 @@ export default {
   noSuchDevice: {
     id: 'NO_SUCH_DEVICE',
     message: 'Device with specified name does not exist.'
+  },
+  noSuchDocument: {
+    id: 'NO_SUCH_DOCUMENT',
+    message: 'Document with specified ID does not exist.'
+  },
+  forbidden: {
+    id: 'FORBIDDEN',
+    message: 'You don\'t have permssion to access specified content.'
   }
 };

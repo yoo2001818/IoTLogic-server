@@ -4,7 +4,7 @@ import loginRequired from './lib/loginRequired';
 import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
 import pick from '../util/pick';
-import { Device } from '../db';
+import { Device, Document } from '../db';
 
 const router = new Express.Router();
 export default router;
@@ -38,7 +38,8 @@ router.param('name', (req, res, next, name) => {
     Device.findOne({
       where: {
         userId: req.user.id, name
-      }
+      },
+      include: [ Document ]
     })
     .then(device => {
       if (device != null) {

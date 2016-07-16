@@ -156,27 +156,27 @@ Result: 400, 401, 404, 200
 
 Result: 400, 401, 404, 200
 
+### Payload
+
+`GET /api/documents/:id/payload`
+
+Result: 400, 401, 404, 200
+
+### Workspace
+
+`GET /api/documents/:id/workspace`
+
+Result: 400, 401, 404, 200
+
+### Workspace write
+
+`POST /api/documents/:id/workspace`
+
+Result: 400, 401, 404, 200
+
 ### Commit
 
 `POST /api/documents/:id/commit`
-
-Result: 400, 401, 404, 200
-
-### Set visibility
-
-`POST /api/documents/:id/visibility`
-
-Result: 400, 401, 404, 200
-
-### Get status
-
-`GET /api/documents/:id/status`
-
-Result: 401, 404, 200
-
-### Set status
-
-`POST /api/documents/:id/status`
 
 Result: 400, 401, 404, 200
 

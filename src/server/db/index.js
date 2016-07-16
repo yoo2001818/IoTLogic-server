@@ -87,11 +87,28 @@ export const Document = sequelize.define('document', inject({
     type: Sequelize.STRING,
     allowNull: false
   },
-  state: Sequelize.ENUM('start', 'stop'),
+  state: {
+    type: Sequelize.ENUM('start', 'stop'),
+    defaultValue: 'start'
+  },
   payload: Sequelize.TEXT,
   payloadTemp: Sequelize.TEXT,
-  visibility: Sequelize.ENUM('private', 'public')
-}, validations.Document));
+  visibility: {
+    type: Sequelize.ENUM('private', 'public'),
+    defaultValue: 'private'
+  }
+}, validations.Document), {
+  instanceMethods: {
+    toJSON: function() {
+      let obj = this.get({
+        plain: true
+      });
+      delete obj.payload;
+      delete obj.payloadTemp;
+      return obj;
+    }
+  }
+});
 
 User.hasMany(Device);
 User.hasMany(Document);
