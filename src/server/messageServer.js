@@ -93,7 +93,16 @@ export default class MessageServer {
         // TODO Push notification
         delete this.dbClients[deviceId];
         delete this.socketClients[clientId];
-        // TODO Remove documents
+      } else {
+        // Check document's client size, then destroy it if nobody is there
+        let synchronizer = this.router.synchronizers[name];
+        if (synchronizer == null) return;
+        if (synchronizer.clientList.length <= 1) {
+          debug('Removing synchronizer ' + name);
+          // Remove synchronizer
+          synchronizer.stop();
+          this.router.removeSynchronizer(name);
+        }
       }
       console.log('Disconnected!');
     });
@@ -105,5 +114,120 @@ export default class MessageServer {
     });
 
     this.connector.start();
+  }
+  updateDevice(device) {
+    debug('Handling updated device ' + device.name);
+    let data = device.toJSON();
+    // Disconnect and reconnect from connected nodes
+    let clientId = this.dbClients[device.id];
+    if (clientId == null) return;
+    for (let key in this.router.synchronizers) {
+      let synchronizer = this.router.synchronizers[key];
+      if (synchronizer.clients[clientId] != null) {
+        // TODO Send disconnect
+        synchronizer.handleDisconnect(clientId);
+        synchronizer.handleConnect(data, clientId);
+      }
+    }
+  }
+  destroyDevice(device) {
+    debug('Handling destroyed device ' + device.name);
+    let clientId = this.dbClients[device.id];
+    if (clientId == null) return;
+    // Disconnect from main
+    this.connector.disconnect(clientId);
+  }
+  addDocument(document) {
+    debug('Handling added document ' + document.name);
+    if (document.devices == null) {
+      throw new Error('Devices value must be present (Eager loading)');
+    }
+    if (document.state !== 'start') {
+      debug('Ignoring stopped document ' + document.name);
+      return;
+    }
+    if (!document.devices.some(device => this.dbClients[device.id] != null)) {
+      debug('All devices are not connected; ignoring');
+      return;
+    }
+    let docId = 'doc' + document.id;
+    debug('Creating environment instance of document ' + document.name);
+    // Create environment
+    let environment = new Environment('__server', this.router,
+      synchronizerConfig, true);
+    this.router.addSynchronizer(docId, environment.synchronizer);
+    environment.setPayload(document.payload);
+    let synchronizer = environment.synchronizer;
+    // Start the environment instance
+    synchronizer.start();
+    document.devices.forEach(device => {
+      let clientId = this.dbClients[device.id];
+      if (clientId == null) return;
+      let data = device.toJSON();
+      debug('Connecting device to document ' + document.name);
+      synchronizer.handleConnect(data, clientId);
+    });
+  }
+  updateDocument(document) {
+    debug('Handling updated document ' + document.name);
+    if (document.devices == null) {
+      throw new Error('Devices value must be present (Eager loading)');
+    }
+    if (document.state !== 'start') {
+      return this.destroyDocument(document);
+    }
+    let docId = 'doc' + document.id;
+    // Is the node missing from documents table?
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) {
+      return this.addDocument(document);
+    }
+    // Update payload
+    synchronizer.push({
+      type: 'reset',
+      data: document.payload
+    });
+    // Update devices
+    let clientIds = [];
+    // Handle joining
+    document.devices.forEach(device => {
+      let clientId = this.dbClients[device.id];
+      if (clientId == null) return;
+      clientIds.push(clientId);
+      if (synchronizer.clients[clientId] == null) {
+        let data = device.toJSON();
+        debug('Connecting device to document ' + document.name);
+        synchronizer.handleConnect(data, clientId);
+      }
+    });
+    // Handle disconnecting
+    synchronizer.clientList.forEach(client => {
+      if (client.id !== this.connector.getClientId() &&
+        clientIds.indexOf(client.id) === -1
+      ) {
+        // Disconnect node
+        debug('Disconnecting client ' + client.id);
+        // TODO Send disconnect
+        synchronizer.handleDisconnect(client.id);
+      }
+    });
+  }
+  destroyDocument(document) {
+    debug('Handling destroyed document ' + document.name);
+    let docId = 'doc' + document.id;
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) return;
+    synchronizer.clientList.forEach(client => {
+      if (client.id !== this.connector.getClientId()) {
+        // Disconnect node
+        debug('Disconnecting client ' + client.id);
+        // TODO Send disconnect
+        synchronizer.handleDisconnect(client.id);
+      }
+    });
+    // Remove synchronizer
+    synchronizer.stop();
+    // Good bye
+    this.router.removeSynchronizer(docId);
   }
 }

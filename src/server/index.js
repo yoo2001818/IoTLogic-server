@@ -72,5 +72,3 @@ httpServer.on('request', app);
 httpServer.listen(networkConfig.port, networkConfig.listen, () => {
   console.log('Listening on port ' + networkConfig.port);
 });
-
-console.log(messageServer);

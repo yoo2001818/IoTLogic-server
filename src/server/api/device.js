@@ -51,7 +51,6 @@ router.param('name', (req, res, next, name) => {
 });
 
 router.get('/devices/:name', ensureDevice, (req, res) => {
-  // TODO: We should return availability state from message server
   res.json(injectConnected(req, req.device));
 });
 
@@ -70,9 +69,9 @@ router.put('/devices/:name', (req, res, next) => {
   } else {
     req.device.update(data)
     .then(device => {
+      req.app.locals.messageServer.updateDevice(device);
       res.json(injectConnected(req, device));
     }, error => handleDBError(error, req, res, next));
-    // TODO: Notify the connected device (if exists)
   }
 });
 
@@ -87,7 +86,9 @@ router.post('/devices/:name/token', ensureDevice, (req, res, next) => {
 });
 
 router.delete('/devices/:name', ensureDevice, (req, res, next) => {
-  // TODO: Disconnect the target device
   req.device.destroy()
-  .then(() => res.json({}), error => handleDBError(error, req, res, next));
+  .then(() => {
+    req.app.locals.messageServer.destroyDevice(req.device);
+    res.json({});
+  }, error => handleDBError(error, req, res, next));
 });

@@ -86,6 +86,8 @@ router.post('/documents', loginRequired, resolveDevices, (req, res, next) => {
   .then(document => {
     return document.setDevices(req.devices || [])
     .then(() => {
+      document.devices = req.devices || [];
+      req.app.locals.messageServer.addDocument(document);
       res.json(stripDevices(document));
     });
   }).catch(error => handleDBError(error, req, res, next));
@@ -138,8 +140,7 @@ router.post('/documents/:id', ensureOwnership, resolveDevices,
       return document;
     }
   }).then(document => {
-    // TODO: We should notify the message server to use the document
-    // (if it's turned on)
+    req.app.locals.messageServer.updateDocument(document);
     res.json(stripDevices(document));
   }).catch(error => handleDBError(error, req, res, next));
 });
@@ -147,7 +148,7 @@ router.post('/documents/:id', ensureOwnership, resolveDevices,
 router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
   req.document.destroy()
   .then(() => {
-    // TODO: Notify message server
+    req.app.locals.messageServer.destroyDocument(req.document);
     res.json({});
   }).catch(error => handleDBError(error, req, res, next));
 });
@@ -168,8 +169,10 @@ router.post('/documents/:id/payload', ensureOwnership, (req, res) => {
     }
   }
   res.json(req.document.update({ payload, payloadTemp: null })
-  .then(() => ({})));
-  // TODO: Notify message server
+  .then(() => {
+    req.app.locals.messageServer.updateDocument(req.document);
+    return {};
+  }));
 });
 
 router.get('/documents/:id/workspace', (req, res) => {
