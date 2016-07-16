@@ -162,6 +162,10 @@ router.post('/documents/:id/payload', ensureOwnership, (req, res) => {
     payload = req.body.payload;
   } else {
     payload = req.document.payloadTemp;
+    if (payload == null) {
+      res.json({});
+      return;
+    }
   }
   res.json(req.document.update({ payload, payloadTemp: null })
   .then(() => ({})));
