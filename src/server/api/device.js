@@ -33,13 +33,30 @@ router.get('/devices', loginRequired, (req, res, next) => {
   }, error => handleDBError(error, req, res, next));
 });
 
+router.post('/devices/', loginRequired, (req, res, next) => {
+  let data = pick(req.body, ['name', 'alias', 'type', 'data'], true);
+  Device.create(Object.assign(data, {
+    userId: req.user.id,
+    token: randomstring.generate()
+  }))
+  .then(device => {
+    let token = device.token;
+    res.json(Object.assign({}, device.toJSON(), { token, connected: false }));
+  }, error => handleDBError(error, req, res, next));
+});
+
 router.param('name', (req, res, next, name) => {
   loginRequired(req, res, () => {
     Device.findOne({
       where: {
         userId: req.user.id, name
       },
-      include: [ Document ]
+      include: [{
+        model: Document,
+        attributes: {
+          exclude: ['payload', 'payloadTemp']
+        }
+      }]
     })
     .then(device => {
       if (device != null) {
@@ -54,25 +71,13 @@ router.get('/devices/:name', ensureDevice, (req, res) => {
   res.json(injectConnected(req, req.device));
 });
 
-router.put('/devices/:name', (req, res, next) => {
+router.post('/devices/:name', ensureDevice, (req, res, next) => {
   let data = pick(req.body, ['name', 'alias', 'type', 'data'], true);
-  if (req.device == null) {
-    Device.create(Object.assign(data, {
-      name: req.params.name,
-      userId: req.user.id,
-      token: randomstring.generate()
-    }))
-    .then(device => {
-      let token = device.token;
-      res.json(Object.assign({}, device.toJSON(), { token, connected: false }));
-    }, error => handleDBError(error, req, res, next));
-  } else {
-    req.device.update(data)
-    .then(device => {
-      req.app.locals.messageServer.updateDevice(device);
-      res.json(injectConnected(req, device));
-    }, error => handleDBError(error, req, res, next));
-  }
+  req.device.update(data)
+  .then(device => {
+    req.app.locals.messageServer.updateDevice(device);
+    res.json(injectConnected(req, device));
+  }, error => handleDBError(error, req, res, next));
 });
 
 router.post('/devices/:name/token', ensureDevice, (req, res, next) => {
@@ -89,6 +94,8 @@ router.delete('/devices/:name', ensureDevice, (req, res, next) => {
   req.device.destroy()
   .then(() => {
     req.app.locals.messageServer.destroyDevice(req.device);
-    res.json({});
+    res.json(Object.assign({}, req.device, {
+      deleted: true
+    }));
   }, error => handleDBError(error, req, res, next));
 });

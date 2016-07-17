@@ -1,4 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+
+import { loadList } from '../action/device';
 
 import { IndexLink } from 'react-router';
 import Entry from '../component/sidebar/entry';
@@ -7,6 +10,7 @@ import __ from '../lang';
 
 class SideNavigation extends Component {
   render() {
+    console.log(this.props);
     return (
       <Entry hideHeader>
         <ul className='side-navigation'>
@@ -21,9 +25,16 @@ class SideNavigation extends Component {
       </Entry>
     );
   }
+  componentDidMount() {
+    this.props.loadList();
+  }
 }
 
 SideNavigation.propTypes = {
+  deviceList: PropTypes.array,
+  loadList: PropTypes.func
 };
 
-export default SideNavigation;
+export default connect(state => ({
+  deviceList: (state.device.list || []).map(v => state.entities.devices[v])
+}), { loadList })(SideNavigation);

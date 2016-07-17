@@ -12,7 +12,7 @@ export default function user(state = {
   const newState = Object.assign({}, state, {
     load
   });
-  const { type, payload, meta, error } = action;
+  const { type, payload, error } = action;
   let username;
   if (payload) username = payload.result;
   switch (type) {
@@ -38,34 +38,6 @@ export default function user(state = {
   case UserActions.LOGOUT:
     if (error) return state;
     return { load, loaded: true, username: null };
-  /*case SessionActions.SIGNUP_FINALIZE:
-    if (error) return state;
-    return Object.assign({}, newState, {
-      login
-    });
-  case SessionActions.LOCAL_SIGNUP:
-    if (error) return state;
-    return Object.assign({}, newState, {
-      login, method: Object.assign({}, state.method, {
-        [meta.method]: Object.assign({}, state.method[meta.method], {
-          inUse: true
-        })
-      })
-    });
-  case SessionActions.METHOD_FETCH:
-    if (error) return state;
-    return Object.assign({}, newState, {
-      method: payload.body
-    });
-  case SessionActions.METHOD_DELETE:
-    if (error) return state;
-    return Object.assign({}, newState, {
-      method: Object.assign({}, state.method, {
-        [meta.method]: Object.assign({}, state.method[meta.method], {
-          inUse: false
-        })
-      })
-    });*/
   }
   return newState;
 }

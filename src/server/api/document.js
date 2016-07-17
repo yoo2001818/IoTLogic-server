@@ -149,7 +149,9 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
   req.document.destroy()
   .then(() => {
     req.app.locals.messageServer.destroyDocument(req.document);
-    res.json({});
+    res.json(Object.assign({}, stripDevices(req.document), {
+      deleted: true
+    }));
   }).catch(error => handleDBError(error, req, res, next));
 });
 
@@ -171,7 +173,7 @@ router.post('/documents/:id/payload', ensureOwnership, (req, res) => {
   res.json(req.document.update({ payload, payloadTemp: null })
   .then(() => {
     req.app.locals.messageServer.updateDocument(req.document);
-    return {};
+    return stripDevices(req.document);
   }));
 });
 
@@ -185,10 +187,10 @@ router.get('/documents/:id/workspace', (req, res) => {
 
 router.post('/documents/:id/workspace', ensureOwnership, (req, res) => {
   res.json(req.document.update({ payloadTemp: req.body.payload })
-  .then(() => ({})));
+  .then(() => stripDevices(req.document)));
 });
 
 router.delete('/documents/:id/workspace', ensureOwnership, (req, res) => {
   res.json(req.document.update({ payloadTemp: null })
-  .then(() => ({})));
+  .then(() => stripDevices(req.document)));
 });
