@@ -8,7 +8,7 @@ import SidebarHeader from '../component/header/sidebar';
 import Sidebar from '../component/sidebar';
 
 import LoginMenu from './loginMenu';
-import SideNavigation from './sideNavigation';
+import SideMenu from './sideMenu';
 
 class AppContainer extends Component {
   render() {
@@ -17,17 +17,17 @@ class AppContainer extends Component {
     return (
       <div className='app-container'>
         <div className='headers'>
-        <Header
-          onSidebar={toggle.bind(null, null)}
-          showSidebar={isOpen}
-          title={title}
-          right={(
-            <div>
-              {headerRight}
-              {showLogin && (<LoginMenu />)}
-            </div>
-          )}
-        />
+          <Header
+            onSidebar={toggle.bind(null, null)}
+            showSidebar={isOpen}
+            title={title}
+            right={(
+              <div>
+                {headerRight}
+                {showLogin && (<LoginMenu />)}
+              </div>
+            )}
+          />
         </div>
         <div className='wrapper'>
           <Sidebar
@@ -36,7 +36,7 @@ class AppContainer extends Component {
           >
             <SidebarHeader left='메뉴' />
             <div className='content'>
-              <SideNavigation />
+              <SideMenu />
               { sidebar }
             </div>
           </Sidebar>

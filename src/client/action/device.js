@@ -12,6 +12,7 @@ export const UPDATE = 'device/update';
 export const fetchList = createAction(FETCH_LIST,
   () => api(GET, '/devices', {}),
   () => ({
+    errors: [401],
     schema: arrayOf(Device)
   }));
 export const fetch = createAction(FETCH,
@@ -55,6 +56,7 @@ export function load(name) {
 export function loadList() {
   return (dispatch, getState) => {
     const device = getState().device;
+    if (device.load && device.load.loading) return Promise.resolve();
     if (!device.loaded) return dispatch(fetchList());
     return Promise.resolve();
   };

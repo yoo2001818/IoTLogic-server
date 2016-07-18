@@ -2,9 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { fetch } from '../action/user';
-
-import AppContainer from '../container/appContainer';
-import __ from '../lang';
+import { loadList } from '../action/device';
 
 import ProgressBar from '../container/progressBar';
 import ErrorOverlay from '../container/errorOverlay';
@@ -12,17 +10,14 @@ import ErrorOverlay from '../container/errorOverlay';
 class App extends Component {
   componentWillMount() {
     this.props.fetch();
+    this.props.loadList();
   }
   render() {
     // Just a mockup..
     return (
       <div id='app'>
         <div className='app-wrapper'>
-          <AppContainer
-            title={__('IndexTitle')}
-          >
-            {this.props.children}
-          </AppContainer>
+          {this.props.children}
         </div>
         <ErrorOverlay />
         <ProgressBar />
@@ -33,7 +28,8 @@ class App extends Component {
 
 App.propTypes = {
   children: PropTypes.node,
-  fetch: PropTypes.func
+  fetch: PropTypes.func,
+  loadList: PropTypes.func
 };
 
-export default connect(null, { fetch })(App);
+export default connect(null, { fetch, loadList })(App);
