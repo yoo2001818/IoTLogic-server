@@ -1,0 +1,15 @@
+.loading-view {
+  padding: 1.5em 0;
+  margin: 0.5em auto;
+  text-align: center;
+  & > .header {
+    font-size: 4em;
+    color: $grey-700;
+    & > .icon {
+      @include fa-icon();
+      &:before {
+        content: $fa-var-question-circle;
+      }
+    }
+  }
+}

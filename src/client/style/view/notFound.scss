@@ -1,0 +1,22 @@
+.not-found-view {
+  background-color: $grey-100;
+  padding: 1em;
+  max-width: 35em;
+  margin: 0.5em auto;
+  border: 1px solid $grey-400;
+  border-radius: 3px;
+  text-align: center;
+  & > .header {
+    font-size: 4em;
+    color: $blue-700;
+    & > .icon {
+      @include fa-icon();
+      &:before {
+        content: $fa-var-question-circle;
+      }
+    }
+  }
+  & > .content {
+    padding: 0.5em;
+  }
+}

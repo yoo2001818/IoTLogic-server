@@ -17,7 +17,13 @@ export const fetchList = createAction(FETCH_LIST,
   }));
 export const fetch = createAction(FETCH,
   (device) => api(GET, `/devices/${device.name}`, {}),
-  () => ({
+  (device) => ({
+    replace: {
+      devices: {
+        [device.name]: null
+      }
+    },
+    errors: [404],
     schema: Device
   }));
 export const deleteDevice = createAction(DELETE_DEVICE,
