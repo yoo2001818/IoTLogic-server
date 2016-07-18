@@ -15,7 +15,14 @@ class LoginMenu extends Component {
     e.preventDefault();
   }
   render() {
-    const { user } = this.props;
+    const { user, loading } = this.props;
+    if (loading) {
+      return (
+        <div className='login-menu loading'>
+          <span className='load-icon' />
+        </div>
+      );
+    }
     if (user == null) { // ...
       // Show login link
       return (
@@ -27,7 +34,7 @@ class LoginMenu extends Component {
       );
     }
     return (
-      <div className='login-menu guest'>
+      <div className='login-menu logged'>
         <div className='user-info'>
           <DropDown href='#' title={(
             user.name || user.username
@@ -47,10 +54,12 @@ class LoginMenu extends Component {
 }
 
 LoginMenu.propTypes = {
+  loading: PropTypes.bool,
   user: PropTypes.object,
   logout: PropTypes.func
 };
 
 export default connect(state => ({
+  loading: state.user.load && state.user.load.loading,
   user: state.entities.users[state.user.username]
 }), { logout })(LoginMenu);

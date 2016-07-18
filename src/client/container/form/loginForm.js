@@ -31,7 +31,7 @@ class LoginForm extends Component {
   }
   render() {
     const { fields: { username, password },
-      handleSubmit, invalid, className } = this.props;
+      handleSubmit, invalid, className, submitting } = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
     return (
       <form onSubmit={onSubmit}>
@@ -45,7 +45,7 @@ class LoginForm extends Component {
             />
           </div>
           <div className='action'>
-            <Button onClick={onSubmit} button disabled={invalid}>
+            <Button onClick={onSubmit} button disabled={invalid || submitting}>
               {__('LoginBtn')}
             </Button>
             <div className='register'>
@@ -63,7 +63,8 @@ LoginForm.propTypes = {
   fields: PropTypes.object,
   invalid: PropTypes.bool,
   onLogin: PropTypes.func,
-  className: PropTypes.string
+  className: PropTypes.string,
+  submitting: PropTypes.bool
 };
 
 export default reduxForm({

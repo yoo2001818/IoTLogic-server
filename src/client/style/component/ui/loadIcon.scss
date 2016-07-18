@@ -1,0 +1,19 @@
+.load-icon {
+  @include fa-icon();
+  &.big {
+    font-size: 4em;
+  }
+  animation: load-spin 2s infinite linear;
+  &:before {
+    content: $fa-var-cog;
+  }
+}
+
+@keyframes load-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

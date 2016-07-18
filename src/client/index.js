@@ -6,10 +6,14 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
+import { complete } from './action/init';
+
 import routes from './view/routes';
 import createStore from './store';
 import { autoDetectLocale } from './lang';
 import { superagentClient } from './util/apiClient';
+
+import prefetch from './util/prefetch';
 
 autoDetectLocale();
 
@@ -24,9 +28,21 @@ let wrapper = document.createElement('div');
 wrapper.className = 'appContainer';
 document.body.appendChild(wrapper);
 
+// Prefetch data..
+function handleUpdate() {
+  if (store.getState().init.loaded) {
+    prefetch(store, this.state);
+  } else {
+    prefetch(store, this.state)
+    .then(() => {
+      store.dispatch(complete());
+    });
+  }
+}
+
 render(
   <Provider store={store}>
-    <Router history={history}>
+    <Router history={history} onUpdate={handleUpdate}>
       { routes }
     </Router>
   </Provider>,

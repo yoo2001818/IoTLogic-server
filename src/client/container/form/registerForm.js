@@ -29,7 +29,7 @@ class RegisterForm extends Component {
   }
   render() {
     const { fields: { username, password, name, email },
-      handleSubmit, invalid, className } = this.props;
+      handleSubmit, invalid, className, submitting } = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
     return (
       <form onSubmit={onSubmit}>
@@ -49,7 +49,7 @@ class RegisterForm extends Component {
             />
           </div>
           <div className='action'>
-            <Button onClick={onSubmit} button disabled={invalid}>
+            <Button onClick={onSubmit} button disabled={invalid || submitting}>
               {__('RegisterBtn')}
             </Button>
             <div className='register'>
@@ -67,7 +67,8 @@ RegisterForm.propTypes = {
   fields: PropTypes.object,
   invalid: PropTypes.bool,
   onRegister: PropTypes.func,
-  className: PropTypes.string
+  className: PropTypes.string,
+  submitting: PropTypes.bool
 };
 
 export default reduxForm({

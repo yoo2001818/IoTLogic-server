@@ -7,8 +7,14 @@
   right: 0;
   bottom: 0;
   background-color: $blue-800;
+  &.transparent {
+    background-color: transparent;
+  }
   &.filter {
     background-color: rgba(#000, 0.5);
+  }
+  &.center > .container > .message > .children {
+    margin-bottom: 0;
   }
   & > .container {
     overflow: auto;

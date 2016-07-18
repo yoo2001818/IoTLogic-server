@@ -1,23 +1,21 @@
 import React, { Component, PropTypes } from 'react';
-import { connect } from 'react-redux';
 
-import { fetch } from '../action/user';
+import { load } from '../action/user';
 import { loadList } from '../action/device';
 
+import InitKeeper from '../container/initKeeper';
 import ProgressBar from '../container/progressBar';
 import ErrorOverlay from '../container/errorOverlay';
 
-class App extends Component {
-  componentWillMount() {
-    this.props.fetch();
-    this.props.loadList();
-  }
+export default class App extends Component {
   render() {
     // Just a mockup..
     return (
       <div id='app'>
         <div className='app-wrapper'>
-          {this.props.children}
+          <InitKeeper>
+            {this.props.children}
+          </InitKeeper>
         </div>
         <ErrorOverlay />
         <ProgressBar />
@@ -27,9 +25,12 @@ class App extends Component {
 }
 
 App.propTypes = {
-  children: PropTypes.node,
-  fetch: PropTypes.func,
-  loadList: PropTypes.func
+  children: PropTypes.node
 };
 
-export default connect(null, { fetch, loadList })(App);
+App.fetchData = function(store) {
+  return Promise.all([
+    store.dispatch(load()),
+    store.dispatch(loadList())
+  ]);
+};

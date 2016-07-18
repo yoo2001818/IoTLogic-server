@@ -18,7 +18,7 @@ export default function load(state = {
     return {
       completed, total, loading, error, updatedAt
     };
-  case LoadActions.COMPLETE:
+  case LoadActions.COMPLETE: {
     const subAction = action.payload;
     if (handleErrors && subAction && subAction.error) {
       if (subAction.payload && subAction.payload.status &&
@@ -45,6 +45,7 @@ export default function load(state = {
     return {
       completed, total, loading, error, updatedAt
     };
+  }
   case LoadActions.ERROR_DISMISS:
     return {
       completed, total, loading, updatedAt

@@ -14,6 +14,10 @@
     }
     & > .subcategory-name {
       border-bottom: 1px solid $grey-400;
+      & > .load-icon {
+        margin-left: 0.3em;
+        vertical-align: middle;
+      }
     }
     & > a {
       border-bottom: 1px solid $grey-400;

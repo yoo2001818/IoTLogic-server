@@ -20,7 +20,10 @@ class SideMenu extends Component {
             </IndexLink>
           </li>
           <li>
-            <div className='subcategory-name'>{__('DevicesTitle')}</div>
+            <div className='subcategory-name'>
+              {__('DevicesTitle')}
+              {this.props.deviceLoading && <span className='load-icon' />}
+            </div>
             <ul className='subcategory'>
               {
                 this.props.deviceList.map(device => (
@@ -55,11 +58,13 @@ class SideMenu extends Component {
 
 SideMenu.propTypes = {
   user: PropTypes.object,
+  deviceLoading: PropTypes.bool,
   deviceList: PropTypes.array,
   loadList: PropTypes.func
 };
 
 export default connect(state => ({
   user: state.entities.users[state.user.username],
+  deviceLoading: state.device.load && state.device.load.loading,
   deviceList: (state.device.list || []).map(v => state.entities.devices[v])
 }), { loadList })(SideMenu);
