@@ -2,10 +2,8 @@
 
 export default function entities(state = {
   users: {},
-  entries: {},
-  tags: {},
-  tagTypes: {},
-  comments: {}
+  documents: {},
+  devices: {}
 }, action) {
   if (action.payload && action.payload.entities) {
     const newState = Object.assign({}, state);

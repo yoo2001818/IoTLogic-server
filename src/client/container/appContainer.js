@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { open, close, toggle } from '../action/sidebar';
 
 import Header from '../component/header';
-import SidebarHeader from '../component/header/sidebar';
 import Sidebar from '../component/sidebar';
 
 import LoginMenu from './loginMenu';
@@ -34,11 +33,9 @@ class AppContainer extends Component {
             visible={isOpen}
             onClose={close.bind(null, null)}
           >
-            <SidebarHeader left='메뉴' />
-            <div className='content'>
-              <SideMenu />
+            <SideMenu>
               { sidebar }
-            </div>
+            </SideMenu>
           </Sidebar>
           <div className='content'>
             { children }

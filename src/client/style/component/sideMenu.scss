@@ -18,6 +18,24 @@
         margin-left: 0.3em;
         vertical-align: middle;
       }
+      & > .add-icon {
+        @include fa-icon();
+        text-decoration: none;
+        float: right;
+        line-height: 1em;
+        padding: 0 0.2em;
+        margin-right: 0.2em;
+        color: $grey-700;
+        &:before {
+          content: $fa-var-plus;
+        }
+        &:hover {
+          color: $blue-700;
+        }
+        &.active {
+          color: $blue-700;
+        }
+      }
     }
     & > a {
       border-bottom: 1px solid $grey-400;

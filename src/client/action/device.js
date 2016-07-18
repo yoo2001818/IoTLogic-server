@@ -16,11 +16,11 @@ export const fetchList = createAction(FETCH_LIST,
     schema: arrayOf(Device)
   }));
 export const fetch = createAction(FETCH,
-  (device) => api(GET, `/devices/${device.name}`, {}),
+  (device) => api(GET, `/devices/${device}`, {}),
   (device) => ({
     replace: {
       devices: {
-        [device.name]: null
+        [device]: null
       }
     },
     errors: [404],
@@ -48,14 +48,15 @@ export const update = createAction(UPDATE,
 
 export function load(name) {
   return (dispatch, getState) => {
-    const { entities: { entries } } = getState();
-    const entry = entries[name];
+    const { entities: { devices } } = getState();
+    const entry = devices[name];
     if (entry != null && entry.documents !== undefined &&
-      new Date().valueOf() - entry.loadedAt < 20000
+      // Push notification is not done yet
+      new Date().valueOf() - entry.loadedAt < 0
     ) {
       return Promise.resolve();
     }
-    return dispatch(fetch({ name }));
+    return dispatch(fetch(name));
   };
 }
 
