@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import { load } from '../action/user';
 import { loadList as deviceLoadList } from '../action/device';
-import { loadList as documentLoadList, fetchPayload } from '../action/document';
+import { loadList as documentLoadList } from '../action/document';
 
 import InitKeeper from '../container/initKeeper';
 import ProgressBar from '../container/progressBar';
@@ -35,7 +35,6 @@ App.fetchData = function(store) {
   return Promise.all([
     store.dispatch(load()),
     store.dispatch(deviceLoadList()),
-    store.dispatch(documentLoadList()),
-    store.dispatch(fetchPayload({ id: 1 }))
+    store.dispatch(documentLoadList())
   ]);
 };

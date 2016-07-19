@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import DeviceMenu from './deviceMenu';
+import DocumentMenu from './documentMenu';
 
 import { IndexLink } from 'react-router';
 import SidebarHeader from '../component/header/sidebar';
@@ -21,14 +22,7 @@ export default class SideMenu extends Component {
                 </IndexLink>
               </li>
               <DeviceMenu />
-              <li>
-                <div className='subcategory-name'>{__('DocumentsTitle')}</div>
-                <ul className='subcategory'>
-                  <li><a>고급 문서</a></li>
-                  <li><a>중급 문서</a></li>
-                  <li><a>저급 문서</a></li>
-                </ul>
-              </li>
+              <DocumentMenu />
             </ul>
           </div>
           { this.props.children }

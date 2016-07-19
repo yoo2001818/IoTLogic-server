@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 
-import { load, confirmDeviceDelete } from '../action/device';
+import { load } from '../action/device';
 
 import DeviceEntryForm from '../container/form/deviceEntryForm';
 import AppContainer from '../container/appContainer';
@@ -31,14 +31,13 @@ class DeviceEntry extends Component {
 }
 
 DeviceEntry.propTypes = {
-  device: PropTypes.object,
-  confirmDeviceDelete: PropTypes.func
+  device: PropTypes.object
 };
 
 const ConnectDeviceEntry = connect(
   (store, props) => ({
     device: store.entities.devices[props.params.name]
-  }), { confirmDeviceDelete }
+  })
 )(DeviceEntry);
 
 ConnectDeviceEntry.fetchData = function(store, routerState) {

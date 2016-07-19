@@ -57,7 +57,7 @@ function ensureOwnership(req, res, next) {
 
 function stripDevices(data) {
   let json = data.toJSON();
-  return Object.assign({}, json, {
+  let obj = Object.assign({}, json, {
     devices: (json.devices || []).map(v => ({
       id: v.id,
       name: v.name
@@ -65,8 +65,10 @@ function stripDevices(data) {
     user: json.user && {
       id: json.user.id,
       username: json.user.username
-    }
+    },
   });
+  delete obj.DeviceDocument;
+  return obj;
 }
 
 const router = new Express.Router();
@@ -74,9 +76,10 @@ export default router;
 
 router.get('/documents', loginRequired, (req, res) => {
   res.json(req.user.getDocuments({
-    include: [ Device ]
-  })
-  .then(v => v.map(stripDevices)));
+    attributes: {
+      exclude: ['payload', 'payloadTemp', 'createdAt', 'updatedAt']
+    }
+  }));
 });
 
 router.post('/documents', loginRequired, resolveDevices, (req, res, next) => {

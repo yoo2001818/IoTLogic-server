@@ -27,7 +27,11 @@ function ensureDevice(req, res, next) {
 }
 
 router.get('/devices', loginRequired, (req, res, next) => {
-  req.user.getDevices()
+  req.user.getDevices({
+    attributes: {
+      exclude: ['createdAt', 'updatedAt']
+    }
+  })
   .then(devices => {
     res.json(devices.map(injectConnected.bind(null, req)));
   }, error => handleDBError(error, req, res, next));
