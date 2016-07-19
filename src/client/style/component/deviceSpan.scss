@@ -31,9 +31,9 @@
       color: $blue-300;
     }
     & > .connection-marker {
-      color: $red-300;
+      color: $grey-700;
       &.connected {
-        color: $green-300;
+        color: $grey-100;
       }
     }
   }

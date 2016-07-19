@@ -9,6 +9,7 @@ import Alert from './alert';
 class ErrorAlert extends Component {
   render() {
     const { error } = this.props;
+    if (error === true) return false;
     if (error && error.name === 'ErrorValidationRequired') return false;
     return (
       <Alert>
@@ -22,6 +23,7 @@ class ErrorAlert extends Component {
 
 ErrorAlert.propTypes = {
   error: PropTypes.oneOfType([
+    PropTypes.bool,
     PropTypes.string,
     PropTypes.shape({
       name: PropTypes.string,

@@ -1,14 +1,15 @@
 import React, { Component, PropTypes } from 'react';
+import classNames from 'classnames';
 
 export default class Button extends Component {
   handleClick(event) {
     if (this.props.onClick) this.props.onClick(event);
   }
   render() {
-    const { children, disabled } = this.props;
+    const { className, children, disabled } = this.props;
     return (
       <button
-        className='button-component'
+        className={classNames('button-component', className)}
         onClick={this.handleClick.bind(this)}
         disabled={disabled}
         ref={v => this.button = v}
@@ -21,6 +22,7 @@ export default class Button extends Component {
 
 Button.propTypes = {
   children: PropTypes.node,
+  className: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool
 };
