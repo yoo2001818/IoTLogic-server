@@ -1,0 +1,23 @@
+.device-entry-form {
+  .device-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    & > li > a {
+      display: block;
+      padding: 0.4em 0.8em;
+      font-size: 1em;
+      color: $grey-800;
+      text-decoration: none;
+      box-sizing: border-box;
+      border-bottom: 1px solid $grey-400;
+      &:hover {
+        background-color: $blue-200;
+        color: $blue-800;
+      }
+    }
+    & > li:last-child > a {
+      border: none;
+    }
+  }
+}

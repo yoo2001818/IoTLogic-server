@@ -55,8 +55,8 @@ function ensureOwnership(req, res, next) {
   });
 }
 
-function stripDevices(data) {
-  let json = data.toJSON();
+function stripDevices(data, isJSON = false) {
+  let json = isJSON ? data : data.toJSON();
   let obj = Object.assign({}, json, {
     devices: (json.devices || []).map(v => ({
       id: v.id,
@@ -77,7 +77,7 @@ export default router;
 router.get('/documents', loginRequired, (req, res) => {
   res.json(req.user.getDocuments({
     attributes: {
-      exclude: ['payload', 'payloadTemp', 'createdAt', 'updatedAt']
+      exclude: ['payload', 'payloadTemp', 'createdAt', 'updatedAt', 'userId']
     }
   }));
 });
@@ -140,11 +140,11 @@ router.post('/documents/:id', ensureOwnership, resolveDevices,
         });
       });
     } else {
-      return document;
+      return document.toJSON();
     }
   }).then(document => {
     req.app.locals.messageServer.updateDocument(document);
-    res.json(stripDevices(document));
+    res.json(stripDevices(document, true));
   }).catch(error => handleDBError(error, req, res, next));
 });
 

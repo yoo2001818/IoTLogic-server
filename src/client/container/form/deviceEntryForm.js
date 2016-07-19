@@ -14,6 +14,8 @@ import Field from '../../component/ui/field';
 import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';
 
+import DocumentSpan from '../../component/documentSpan';
+
 import __ from '../../lang';
 
 function capitalize(str) {
@@ -36,7 +38,7 @@ class DeviceEntryForm extends Component {
   }
   render() {
     const { fields: { name, alias, type },
-      handleSubmit, invalid, submitting, device, className, dirty }
+      handleSubmit, invalid, submitting, device, className, dirty, documents }
       = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
     if (device == null) return false;
@@ -57,6 +59,11 @@ class DeviceEntryForm extends Component {
               <Field label={__('DeviceTypeLabel')}>
                 <div className='readonly'>
                   {__('DeviceType' + capitalize(type.value))}
+                </div>
+              </Field>
+              <Field label={__('CreatedDateLabel')}>
+                <div className='readonly'>
+                  {new Date(device.createdAt).toLocaleString()}
                 </div>
               </Field>
               <div className='section-action'>
@@ -83,14 +90,19 @@ class DeviceEntryForm extends Component {
               </Field>
             </Section>
             <Section title={__('DeviceDocumentSection')}>
-              Work in progress
+              <ul className='device-list'>
+                {documents.map(document => (
+                  <li key={document.id}>
+                    <DocumentSpan document={document} />
+                  </li>
+                ))}
+              </ul>
             </Section>
+            {/*
             <Section title={__('DevicePlatformSection')}>
               Work in progress
             </Section>
-            <pre>
-              {JSON.stringify(device, null, 2)}
-            </pre>
+            */}
           </form>
         </div>
     );
@@ -104,6 +116,7 @@ DeviceEntryForm.propTypes = {
   submitting: PropTypes.bool,
   dirty: PropTypes.bool,
   device: PropTypes.object,
+  documents: PropTypes.array,
   className: PropTypes.string,
   confirmDeviceDelete: PropTypes.func,
   deviceUpdate: PropTypes.func,
@@ -116,4 +129,7 @@ export default reduxForm({
   validate: (values) => {
     return validate(values, Device, true);
   }
-}, null, { confirmDeviceDelete, deviceUpdate, replace })(DeviceEntryForm);
+}, (state, props) => ({
+  documents: (props.device.documents || []).map(
+    v => state.entities.documents[v])
+}), { confirmDeviceDelete, deviceUpdate, replace })(DeviceEntryForm);

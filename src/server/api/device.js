@@ -9,11 +9,19 @@ import { Device, Document } from '../db';
 const router = new Express.Router();
 export default router;
 
+function stripAssociation(document) {
+  let json = Object.assign({}, document);
+  delete json.DeviceDocument;
+  return json;
+}
+
 function injectConnected(req, device) {
   // This is too long... whatever.
   let clientId = req.app.locals.messageServer.dbClients[device.id];
-  return Object.assign({}, device.toJSON(), {
-    connected: clientId != null
+  let json = device.toJSON();
+  return Object.assign({}, json, {
+    connected: clientId != null,
+    documents: json.documents && json.documents.map(stripAssociation)
   });
 }
 
@@ -29,7 +37,7 @@ function ensureDevice(req, res, next) {
 router.get('/devices', loginRequired, (req, res, next) => {
   req.user.getDevices({
     attributes: {
-      exclude: ['createdAt', 'updatedAt']
+      exclude: ['createdAt', 'updatedAt', 'userId']
     }
   })
   .then(devices => {
@@ -58,7 +66,8 @@ router.param('name', (req, res, next, name) => {
       include: [{
         model: Document,
         attributes: {
-          exclude: ['payload', 'payloadTemp']
+          exclude: ['payload', 'payloadTemp', 'createdAt', 'updatedAt',
+            'userId']
         }
       }]
     })
