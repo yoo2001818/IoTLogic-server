@@ -6,6 +6,7 @@ import { loadList } from '../action/device';
 import InitKeeper from '../container/initKeeper';
 import ProgressBar from '../container/progressBar';
 import ErrorOverlay from '../container/errorOverlay';
+import ModalOverlay from '../container/modalOverlay';
 
 export default class App extends Component {
   render() {
@@ -18,6 +19,7 @@ export default class App extends Component {
           </InitKeeper>
         </div>
         <ErrorOverlay />
+        <ModalOverlay />
         <ProgressBar />
       </div>
     );

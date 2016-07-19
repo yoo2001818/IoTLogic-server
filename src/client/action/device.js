@@ -2,6 +2,8 @@ import { createAction } from 'redux-actions';
 import { arrayOf } from 'normalizr';
 import { Device } from '../schema/index';
 import { api, GET, POST, DELETE } from '../middleware/api';
+import { open as modalOpen } from './modal';
+import { goBack } from 'react-router-redux';
 
 export const FETCH_LIST = 'device/fetchList';
 export const FETCH = 'device/fetch';
@@ -39,12 +41,27 @@ export const create = createAction(CREATE,
     schema: Device
   }));
 export const update = createAction(UPDATE,
-  (device) => api(POST, `/devices/${device.name}`, {
+  (name, device) => api(POST, `/devices/${name}`, {
     body: device
   }),
-  () => ({
-    schema: Device
-  }));
+  (name, device) => {
+    if (name === device.name || device.name === undefined) {
+      return {
+        schema: Device
+      };
+    }
+    return {
+      append: {
+        devices: {
+          [name]: {
+            deleted: true
+          }
+        }
+      },
+      previous: name,
+      schema: Device
+    };
+  });
 
 export function load(name) {
   return (dispatch, getState) => {
@@ -66,5 +83,29 @@ export function loadList() {
     if (device.load && device.load.loading) return Promise.resolve();
     if (!device.loaded) return dispatch(fetchList());
     return Promise.resolve();
+  };
+}
+
+export function confirmDeviceDelete(device) {
+  return (dispatch) => {
+    dispatch(modalOpen({
+      title: 'ConfirmDeviceDeleteTitle',
+      body: {
+        key: 'ConfirmDeviceDeleteDesc',
+        value: [
+          device.alias || device.name
+        ]
+      },
+      choices: [
+        {
+          name: 'Yes',
+          type: 'red',
+          action: [goBack(), deleteDevice(device)]
+        },
+        {
+          name: 'No'
+        }
+      ]
+    }));
   };
 }

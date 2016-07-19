@@ -16,6 +16,10 @@ export default function entities(state = {
           original[entity] = target[entity];
           continue;
         }
+        if (target[entity].deleted) {
+          original[entity] = null;
+          continue;
+        }
         original[entity] = Object.assign({}, original[entity], target[entity], {
           loadedAt: new Date().valueOf()
         });

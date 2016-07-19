@@ -6,6 +6,7 @@ import createLogger from 'redux-logger';
 import apiMiddleware from '../middleware/api';
 import normalizeMiddleware from '../middleware/normalize';
 import injectReplaceMiddleware from '../middleware/injectReplace';
+import injectAppendMiddleware from '../middleware/injectAppend';
 
 import reducers from '../reducer';
 
@@ -24,6 +25,7 @@ export default function configureStore(initialState, client, appendage = []) {
     promiseMiddleware,
     normalizeMiddleware,
     injectReplaceMiddleware,
+    injectAppendMiddleware,
     logger
   ].concat(appendage));
 

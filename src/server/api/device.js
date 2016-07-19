@@ -94,7 +94,7 @@ router.delete('/devices/:name', ensureDevice, (req, res, next) => {
   req.device.destroy()
   .then(() => {
     req.app.locals.messageServer.destroyDevice(req.device);
-    res.json(Object.assign({}, req.device, {
+    res.json(Object.assign({}, req.device.toJSON(), {
       deleted: true
     }));
   }, error => handleDBError(error, req, res, next));

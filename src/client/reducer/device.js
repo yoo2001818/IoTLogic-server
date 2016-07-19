@@ -13,7 +13,7 @@ export default function device(state = {
   const newState = Object.assign({}, state, {
     load
   });
-  const { type, payload, error } = action;
+  const { type, payload, error, meta } = action;
   if (action.error) return newState;
   switch (type) {
   case DeviceActions.FETCH_LIST:
@@ -21,10 +21,16 @@ export default function device(state = {
       loaded: true,
       list: error ? null : payload.result
     });
+  case DeviceActions.UPDATE:
+    if (error) return state;
+    return Object.assign({}, newState, {
+      list: (state.list || []).map(
+        v => v === meta.previous ? payload.result : v)
+    });
   case DeviceActions.DELETE_DEVICE:
     if (error) return state;
     return Object.assign({}, newState, {
-      list: (state.list || []).filter(v => v.id !== payload.result.id)
+      list: (state.list || []).filter(v => v !== payload.result)
     });
   case UserActions.LOGIN:
   case UserActions.REGISTER:

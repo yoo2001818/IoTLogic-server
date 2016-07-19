@@ -17,3 +17,21 @@
     transform: rotate(360deg);
   }
 }
+
+.icon-right {
+  margin-right: 0.3em;
+}
+
+.trash-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-trash;
+  }
+}
+
+.check-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-check;
+  }
+}

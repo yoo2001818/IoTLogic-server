@@ -4,7 +4,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
+import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
 
 import { complete } from './action/init';
 
@@ -17,7 +17,9 @@ import prefetch from './util/prefetch';
 
 autoDetectLocale();
 
-let store = createStore(undefined, superagentClient());
+let store = createStore(undefined, superagentClient(), [
+  routerMiddleware(browserHistory)
+]);
 const history = syncHistoryWithStore(browserHistory, store);
 
 // If devTools is enabled, show popup.
