@@ -41,7 +41,7 @@ class LoginMenu extends Component {
           )}>
             <ul className='menu-list'>
               <li>
-                <Link to='/login' onClick={this.handleLogout.bind(this)}>
+                <Link to='/' onClick={this.handleLogout.bind(this)}>
                   {__('Logout')}
                 </Link>
               </li>

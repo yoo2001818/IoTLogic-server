@@ -21,7 +21,9 @@ class DocumentMenu extends Component {
         <ul className='subcategory'>
           {
             this.props.list.map(document => (
-              <li key={document.id}><DocumentSpan document={document} /></li>
+              <li key={document.id}>
+                <DocumentSpan document={document} />
+              </li>
             ))
           }
         </ul>

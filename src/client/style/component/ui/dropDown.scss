@@ -52,7 +52,7 @@
       text-decoration: none;
       &:hover {
         color: $grey-700;
-        text-decoration: underline;
+        text-decoration: none;
       }
     }
     &:before {
@@ -83,7 +83,12 @@
           display: block;
           padding: 0.5em 1em;
           &:hover {
-            background-color: $grey-200;
+            background-color: $blue-200;
+            color: $blue-800;
+          }
+          &.active {
+            background-color: $blue-700;
+            color: $blue-100;
           }
         }
       }

@@ -6,6 +6,9 @@ import Register from './register';
 import Index from './index';
 import DeviceEntry from './deviceEntry';
 import DocumentEntry from './documentEntry';
+import DocumentEntryIndex from './document/index';
+import DocumentEntryScript from './document/script';
+import DocumentEntryConsole from './document/console';
 import NotFound from './notFound';
 
 export default (
@@ -18,7 +21,11 @@ export default (
     </Route>
     <Route path='documents'>
       <IndexRoute component={NotFound} />
-      <Route path=':id' component={DocumentEntry} />
+      <Route path=':id' component={DocumentEntry}>
+        <IndexRoute component={DocumentEntryIndex} />
+        <Route path='script' component={DocumentEntryScript} />
+        <Route path='console' component={DocumentEntryConsole} />
+      </Route>
     </Route>
     <Route path='*' component={NotFound} />
   </Route>
