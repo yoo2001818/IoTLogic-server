@@ -25,7 +25,7 @@ export const fetch = createAction(FETCH,
         [device]: null
       }
     },
-    errors: [404],
+    errors: [401, 404],
     schema: Device
   }));
 export const deviceDelete = createAction(DEVICE_DELETE,

@@ -18,3 +18,5 @@ export default class Index extends Component {
     );
   }
 }
+
+Index.noLogin = true;

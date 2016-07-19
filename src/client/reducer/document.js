@@ -14,7 +14,6 @@ export default function device(state = {
     load
   });
   const { type, payload, error } = action;
-  if (action.error) return newState;
   switch (type) {
   case DocumentActions.FETCH_LIST:
     return Object.assign({}, newState, {
@@ -31,6 +30,7 @@ export default function device(state = {
   case UserActions.LOGIN:
   case UserActions.REGISTER:
   case UserActions.LOGOUT:
+    if (error) return state;
     return Object.assign({}, newState, {
       loaded: false,
       list: []

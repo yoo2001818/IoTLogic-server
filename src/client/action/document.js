@@ -26,7 +26,13 @@ export const fetchList = createAction(FETCH_LIST,
   }));
 export const fetch = createAction(FETCH,
   id => api(GET, `/documents/${id}`, {}),
-  () => ({
+  id => ({
+    replace: {
+      documents: {
+        [id]: null
+      }
+    },
+    errors: [401, 404],
     schema: Document
   }));
 export const create = createAction(CREATE,

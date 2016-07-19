@@ -41,9 +41,13 @@ Register.propTypes = {
   logout: PropTypes.func
 };
 
-export default connect(
+export const ConnectRegister = connect(
   state => ({
     username: state.user.username,
   }),
   { register, logout }
 )(Register);
+
+export default ConnectRegister;
+
+ConnectRegister.noLogin = true;
