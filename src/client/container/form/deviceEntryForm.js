@@ -36,7 +36,8 @@ class DeviceEntryForm extends Component {
   }
   render() {
     const { fields: { name, alias, type },
-      handleSubmit, invalid, submitting, device, className } = this.props;
+      handleSubmit, invalid, submitting, device, className, dirty }
+      = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
     if (device == null) return false;
     return (
@@ -65,7 +66,9 @@ class DeviceEntryForm extends Component {
                   <span className='trash-icon icon-right' />
                   {__('DeviceDelete')}
                 </Button>
-                <Button onClick={onSubmit} disabled={invalid || submitting}>
+                <Button onClick={onSubmit} disabled={!dirty || invalid ||
+                  submitting}
+                >
                   <span className='check-icon icon-right'  />
                   {__('Save')}
                 </Button>
@@ -99,6 +102,7 @@ DeviceEntryForm.propTypes = {
   fields: PropTypes.object,
   invalid: PropTypes.bool,
   submitting: PropTypes.bool,
+  dirty: PropTypes.bool,
   device: PropTypes.object,
   className: PropTypes.string,
   confirmDeviceDelete: PropTypes.func,

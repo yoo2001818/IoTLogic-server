@@ -7,7 +7,7 @@ import { goBack } from 'react-router-redux';
 
 export const FETCH_LIST = 'device/fetchList';
 export const FETCH = 'device/fetch';
-export const DELETE_DEVICE = 'device/delete';
+export const DEVICE_DELETE = 'device/delete';
 export const CREATE = 'device/create';
 export const UPDATE = 'device/update';
 
@@ -28,7 +28,7 @@ export const fetch = createAction(FETCH,
     errors: [404],
     schema: Device
   }));
-export const deleteDevice = createAction(DELETE_DEVICE,
+export const deviceDelete = createAction(DEVICE_DELETE,
   (device) => api(DELETE, `/devices/${device.name}`, {}),
   () => ({
     schema: Device
@@ -100,7 +100,7 @@ export function confirmDeviceDelete(device) {
         {
           name: 'Yes',
           type: 'red',
-          action: [goBack(), deleteDevice(device)]
+          action: [goBack(), deviceDelete(device)]
         },
         {
           name: 'No'

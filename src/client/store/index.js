@@ -7,6 +7,7 @@ import apiMiddleware from '../middleware/api';
 import normalizeMiddleware from '../middleware/normalize';
 import injectReplaceMiddleware from '../middleware/injectReplace';
 import injectAppendMiddleware from '../middleware/injectAppend';
+import injectRelationMiddleware from '../middleware/injectRelation';
 
 import reducers from '../reducer';
 
@@ -26,6 +27,7 @@ export default function configureStore(initialState, client, appendage = []) {
     normalizeMiddleware,
     injectReplaceMiddleware,
     injectAppendMiddleware,
+    injectRelationMiddleware,
     logger
   ].concat(appendage));
 

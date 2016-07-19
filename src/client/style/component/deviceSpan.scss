@@ -1,6 +1,7 @@
 .device-span {
+  overflow: hidden;
+  text-overflow: ellipsis;
   & > .alias {
-
   }
   & > .name {
     padding-left: 0.2em;

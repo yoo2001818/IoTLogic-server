@@ -156,41 +156,48 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
 });
 
 router.get('/documents/:id/payload', (req, res) => {
-  res.json(req.document.payload);
+  res.type('text/plain');
+  res.send(req.document.payload);
 });
 
-router.post('/documents/:id/payload', ensureOwnership, (req, res) => {
+router.post('/documents/:id/payload', ensureOwnership, (req, res, next) => {
   let payload;
   if (req.body.payload) {
     payload = req.body.payload;
   } else {
     payload = req.document.payloadTemp;
     if (payload == null) {
-      res.json({});
+      res.type('text/plain');
+      res.json(payload);
       return;
     }
   }
-  res.json(req.document.update({ payload, payloadTemp: null })
+  req.document.update({ payload, payloadTemp: null })
   .then(() => {
     req.app.locals.messageServer.updateDocument(req.document);
-    return stripDevices(req.document);
-  }));
+    res.type('text/plain');
+    res.send(payload);
+  }).catch(error => handleDBError(error, req, res, next));
 });
 
 router.get('/documents/:id/workspace', (req, res) => {
+  res.type('text/plain');
   if (req.document.payloadTemp) {
-    res.json(req.document.payloadTemp);
+    res.send(req.document.payloadTemp);
     return;
   }
-  res.json(req.document.payload);
+  res.send(req.document.payload);
 });
 
 router.post('/documents/:id/workspace', ensureOwnership, (req, res) => {
   res.json(req.document.update({ payloadTemp: req.body.payload })
-  .then(() => stripDevices(req.document)));
+  .then(() => ({})));
 });
 
-router.delete('/documents/:id/workspace', ensureOwnership, (req, res) => {
-  res.json(req.document.update({ payloadTemp: null })
-  .then(() => stripDevices(req.document)));
+router.delete('/documents/:id/workspace', ensureOwnership, (req, res, next) => {
+  req.document.update({ payloadTemp: null })
+  .then(() => {
+    res.type('text/plain');
+    res.send(req.document.payload);
+  }).catch(error => handleDBError(error, req, res, next));
 });

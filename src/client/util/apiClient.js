@@ -49,22 +49,20 @@ export function superagentClient(req) {
               status, body, error: err.toString()
             });
           } else {
-            if (err.message ===
-              'Origin is not allowed by Access-Control-Allow-Origin'
-            ) {
-              // No, it's not a CORS error.
-              err.message =
-                'Cannot establish connection to the server';
-            }
             // Network error!
             return reject({
               status: -100, body: err.message, error: err.toString()
             });
           }
         }
-        const { status, body } = res;
+        const { status, body, text, type } = res;
+        if (options.plain) {
+          return resolve({
+            status, body: text, type
+          });
+        }
         return resolve({
-          status, body
+          status, type, body
         });
       });
     }); // Client lag simulation

@@ -174,9 +174,21 @@ Result: 400, 401, 404, 200
 
 Result: 400, 401, 404, 200
 
+### Delete workspace
+
+`DELETE /api/documents/:id/workspace`
+
+Result: 400, 401, 404, 200
+
 ### Commit
 
-`POST /api/documents/:id/commit`
+`POST /api/documents/:id/payload`
+
+Result: 400, 401, 404, 200
+
+### Evaluate
+
+`POST /api/documents/:id/eval`
 
 Result: 400, 401, 404, 200
 
