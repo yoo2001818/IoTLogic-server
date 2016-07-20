@@ -28,7 +28,7 @@ class DeviceList extends Component {
                   </div>
                 </li>
             ))) : (
-              <p className='tip'>{__('DeviceListEmptyTip')}</p>
+              <p className='tip'>{__('DocumentDeviceListEmptyTip')}</p>
             )
           }
         </ul>
@@ -46,9 +46,13 @@ class DeviceList extends Component {
                 </li>
             ))) : (
               this.props.deviceListEmpty ? (
-                <p className='tip'>{__('DeviceListBottomRealEmptyTip')}</p>
+                <p className='tip'>
+                  {__('DocumentDeviceListBottomRealEmptyTip')}
+                </p>
               ) : (
-                <p className='tip'>{__('DeviceListBottomEmptyTip')}</p>
+                <p className='tip'>
+                  {__('DocumentDeviceListBottomEmptyTip')}
+                </p>
               )
             )
           }
