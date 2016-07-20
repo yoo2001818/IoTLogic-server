@@ -4,9 +4,31 @@ var gutil = require('gulp-util');
 var eslint = require('gulp-eslint');
 var babel = require('gulp-babel');
 var webpack = require('webpack');
+var markdown = require('gulp-markdown');
+var wrapper = require('gulp-wrapper');
 var webpackConfiguration = require('./webpack.config.js');
 var del = require('del');
+var fs = require('fs');
 require('babel-core/register');
+
+/*** Manual ***/
+gulp.task('doc-md', function () {
+  return gulp.src(['doc/**/*.md'])
+  .pipe(markdown())
+  .pipe(wrapper({
+    header: fs.readFileSync('./doc/header.html', 'utf-8'),
+    footer: fs.readFileSync('./doc/footer.html', 'utf-8')
+  }))
+  .pipe(gulp.dest('doc-dist'));
+});
+
+gulp.task('doc-copy', function() {
+  return gulp.src(['doc/**/*', '!doc/**/*.md'])
+    .pipe(gulp.dest('doc-dist'));
+});
+
+gulp.task('doc', ['doc-md', 'doc-copy']);
+
 
 /*** Unit tests ***/
 gulp.task('lint', function () {

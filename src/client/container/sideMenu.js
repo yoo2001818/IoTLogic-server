@@ -23,6 +23,11 @@ export default class SideMenu extends Component {
               </li>
               <DeviceMenu />
               <DocumentMenu />
+              <li>
+                <a href='/doc' target='_blank'>
+                  {__('ManualTitle')}
+                </a>
+              </li>
             </ul>
           </div>
           { this.props.children }

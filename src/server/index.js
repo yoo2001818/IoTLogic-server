@@ -40,6 +40,8 @@ app.get('/favicon.ico', (req, res) => {
   res.sendStatus(404);
 });
 
+app.use('/doc', serveStatic('./doc-dist'));
+
 app.use((req, res) => {
   res.send(`
     <!DOCTYPE html>

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import { Link } from 'react-router';
 import classNames from 'classnames';
+import { replace } from 'react-router-redux';
 
 import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';
@@ -12,7 +13,11 @@ class LoginForm extends Component {
   handleSubmit(values) {
     return this.props.onLogin(values, {errors: [401]})
     .then(action => {
-      if (!action.error) return;
+      if (!action.error) {
+        // This is so weird. Well. whatever.
+        this.props.replace(location.pathname);
+        return;
+      }
       if (action.payload.body.id === 'INVALID_USERNAME') {
         throw {
           username: {
@@ -64,7 +69,8 @@ LoginForm.propTypes = {
   invalid: PropTypes.bool,
   onLogin: PropTypes.func,
   className: PropTypes.string,
-  submitting: PropTypes.bool
+  submitting: PropTypes.bool,
+  replace: PropTypes.func
 };
 
 export default reduxForm({
@@ -84,4 +90,4 @@ export default reduxForm({
     }
     return validations;
   }
-})(LoginForm);
+}, null, { replace })(LoginForm);

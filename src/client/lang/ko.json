@@ -72,6 +72,7 @@
   "DeviceListEmptyTip": "아무 장치도 연결되어 있지 않습니다. 아래 장치 옆의 + 버튼을 눌러 연결할 수 있습니다.",
   "DeviceListBottomEmptyTip": "연결되지 않은 장치가 없습니다.",
   "DeviceListBottomRealEmptyTip": "현재 아무 장치도 등록되어 있지 않습니다. 메뉴의 장치 옆에 있는 + 버튼을 눌러 장치를 추가하세요.",
+  "ManualTitle": "도움말",
   "ErrorUsernameInvalid": "존재하지 않는 아이디입니다",
   "ErrorPasswordInvalid": "비밀번호가 틀립니다",
   "ErrorValidationUsernamePolicy": "알파벳과 숫자만 사용할 수 있습니다",
