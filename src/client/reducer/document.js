@@ -20,13 +20,16 @@ export default function device(state = {
       loaded: true,
       list: error ? null : payload.result
     });
-  /*
-  case DeviceActions.DELETE_DEVICE:
+  case DocumentActions.CREATE:
+    if (error) return state;
+    return Object.assign({}, newState, {
+      list: (state.list || []).concat(payload.result)
+    });
+  case DocumentActions.DOCUMENT_DELETE:
     if (error) return state;
     return Object.assign({}, newState, {
       list: (state.list || []).filter(v => v !== payload.result)
     });
-  */
   case UserActions.LOGIN:
   case UserActions.REGISTER:
   case UserActions.LOGOUT:

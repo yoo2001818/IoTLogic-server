@@ -57,7 +57,7 @@ function ensureOwnership(req, res, next) {
 
 function stripDevices(data, isJSON = false) {
   let json = isJSON ? data : data.toJSON();
-  let devicesJSON = json.devices.slice() || [];
+  let devicesJSON = (json.devices || []).slice();
   devicesJSON.sort((a, b) => {
     return a.deviceDocumentLink.position - b.deviceDocumentLink.position;
   });

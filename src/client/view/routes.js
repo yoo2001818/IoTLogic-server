@@ -9,6 +9,9 @@ import DocumentEntry from './documentEntry';
 import DocumentEntryIndex from './document/index';
 import DocumentEntryScript from './document/script';
 import DocumentEntryConsole from './document/console';
+import NewDocument from './newDocument';
+import NewDevice from './newDevice';
+import NewDevicePC from './newDevice/pc';
 import NotFound from './notFound';
 
 export default (
@@ -25,6 +28,13 @@ export default (
         <IndexRoute component={DocumentEntryIndex} />
         <Route path='script' component={DocumentEntryScript} />
         <Route path='console' component={DocumentEntryConsole} />
+      </Route>
+    </Route>
+    <Route path='new'>
+      <Route path='document' component={NewDocument} />
+      <Route path='device'>
+        <IndexRoute component={NewDevice} />
+        <Route path='pc' component={NewDevicePC} />
       </Route>
     </Route>
     <Route path='*' component={NotFound} />

@@ -1,10 +1,4 @@
-.not-found-view {
-  background-color: $grey-100;
-  padding: 1em;
-  max-width: 35em;
-  margin: 1em auto;
-  border: 1px solid $grey-400;
-  border-radius: 3px;
+.not-found-view > .content {
   text-align: center;
   & > .header {
     font-size: 4em;
@@ -16,7 +10,7 @@
       }
     }
   }
-  & > .content {
+  & > .message {
     padding: 0.5em;
   }
 }

@@ -2,8 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import classNames from 'classnames';
 
-import { confirmDocumentDelete, update as documentUpdate, updatePayload }
-  from '../../action/document';
+import { confirmDocumentDelete, update as documentUpdate, updatePayload,
+  create as documentCreate } from '../../action/document';
+import { push } from 'react-router-redux';
 
 import { Document } from '../../../validation/schema';
 import validate from '../../../validation/validate';
@@ -24,6 +25,14 @@ class DocumentEntryForm extends Component {
     this.props.confirmDocumentDelete(this.props.document);
   }
   handleSubmit(values) {
+    if (this.props.creating) {
+      return this.props.documentCreate(values)
+      .then(action => {
+        if (action.error) return;
+        console.log(action);
+        this.props.push(`/documents/${action.payload.result}`);
+      });
+    }
     return this.props.documentUpdate(this.props.document.id, values);
   }
   handleReset(e) {
@@ -43,10 +52,10 @@ class DocumentEntryForm extends Component {
   }
   render() {
     const { fields: { name, state, devices },
-      handleSubmit, invalid, submitting, className, dirty, document }
+      handleSubmit, invalid, submitting, className, dirty, document, creating }
       = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
-    if (document == null) return false;
+    if (document == null && !creating) return false;
     return (
         <div className={classNames('document-entry-form', className)}>
           <form onSubmit={onSubmit}>
@@ -75,52 +84,58 @@ class DocumentEntryForm extends Component {
                   {value: 'private', label: __('DocumentVisibilityPrivate')},
                 ]} />
               </Field>*/}
-              <Field label={__('CreatedDateLabel')}>
-                <div className='readonly'>
-                  {new Date(document.createdAt).toLocaleString()}
-                </div>
-              </Field>
-              <div className='section-action'>
-                <Button className='red' div noFocus
-                  onClick={this.handleDelete.bind(this)}
-                >
-                  <span className='trash-icon icon-right' />
-                  {__('DocumentDelete')}
-                </Button>
-                <Button onClick={onSubmit} disabled={!dirty || invalid ||
-                  submitting}
-                >
-                  <span className='check-icon icon-right'  />
-                  {__('Save')}
-                </Button>
-              </div>
-            </Section>
-            <Section title={__('DocumentSourceSection')}>
-              <p className='tip'>{__('DocumentSourceSectionHelp')}</p>
-              <div className='section-action'>
-                <label>
-                  <input type='file' className='file-input'
-                    accept='.txt,.scm,.scheme,.ss'
-                    ref={input => this.fileInput = input}
-                    onChange={this.handleUpload.bind(this)}
-                  />
-                  <Button className='orange' div>
-                    <span className='upload-icon icon-right' />
-                    {__('SourceUpload')}
+              {!creating && (
+                <Field label={__('CreatedDateLabel')}>
+                  <div className='readonly'>
+                    {new Date(document.createdAt).toLocaleString()}
+                  </div>
+                </Field>
+              )}
+              {!creating && (
+                <div className='section-action'>
+                    <Button className='red' div noFocus
+                      onClick={this.handleDelete.bind(this)}
+                    >
+                      <span className='trash-icon icon-right' />
+                      {__('DocumentDelete')}
+                    </Button>
+                  <Button onClick={onSubmit} disabled={!dirty || invalid ||
+                    submitting}
+                  >
+                    <span className='check-icon icon-right'  />
+                    {__('Save')}
                   </Button>
-                </label>
-                <Button className='green'
-                  href={`/api/documents/${document.id}/payload`}
-                >
-                  <span className='download-icon icon-right' />
-                  {__('SourceDownload')}
-                </Button>
-              </div>
+                </div>
+              )}
             </Section>
+            {!creating && (
+              <Section title={__('DocumentSourceSection')}>
+                <p className='tip'>{__('DocumentSourceSectionHelp')}</p>
+                <div className='section-action'>
+                  <label>
+                    <input type='file' className='file-input'
+                      accept='.txt,.scm,.scheme,.ss'
+                      ref={input => this.fileInput = input}
+                      onChange={this.handleUpload.bind(this)}
+                    />
+                    <Button className='orange' div>
+                      <span className='upload-icon icon-right' />
+                      {__('SourceUpload')}
+                    </Button>
+                  </label>
+                  <Button className='green'
+                    href={`/api/documents/${document.id}/payload`}
+                  >
+                    <span className='download-icon icon-right' />
+                    {__('SourceDownload')}
+                  </Button>
+                </div>
+              </Section>
+            )}
             <Section title={__('DocumentDeviceSection')}>
               <DeviceList {...devices} />
               <div className='section-action'>
-                {dirty && (
+                {dirty && !creating && (
                   <Button className='orange' div
                     onClick={this.handleReset.bind(this)}
                   >
@@ -132,7 +147,7 @@ class DocumentEntryForm extends Component {
                   submitting}
                 >
                   <span className='check-icon icon-right'  />
-                  {__('Save')}
+                  {creating ? __('Create') : __('Save')}
                 </Button>
               </div>
             </Section>
@@ -152,8 +167,11 @@ DocumentEntryForm.propTypes = {
   className: PropTypes.string,
   confirmDocumentDelete: PropTypes.func,
   documentUpdate: PropTypes.func,
+  documentCreate: PropTypes.func,
   updatePayload: PropTypes.func,
-  resetForm: PropTypes.func
+  resetForm: PropTypes.func,
+  push: PropTypes.func,
+  creating: PropTypes.bool
 };
 
 export default reduxForm({
@@ -161,10 +179,13 @@ export default reduxForm({
   fields: ['name', 'devices', 'visibility', 'state'],
   initialValues: {
     visibility: 'private',
-    state: 'stop'
+    state: 'stop',
+    devices: [],
+    name: ''
   },
   validate: (values) => {
     return validate(values, Document, true);
   }
-}, null, { confirmDocumentDelete, documentUpdate, updatePayload }
+}, null, { confirmDocumentDelete, documentUpdate,
+  updatePayload, documentCreate, push }
 )(DocumentEntryForm);

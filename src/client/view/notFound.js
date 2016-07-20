@@ -6,12 +6,14 @@ export default class NotFound extends Component {
   render() {
     return (
       <AppContainer title={__('NotFoundTitle')}>
-        <div className='not-found-view'>
-          <div className='header'>
-            <span className='icon' />
-          </div>
+        <div className='not-found-view general-view'>
           <div className='content'>
-            {__('NotFoundDesc')}
+            <div className='header'>
+              <span className='icon' />
+            </div>
+            <div className='message'>
+              {__('NotFoundDesc')}
+            </div>
           </div>
         </div>
       </AppContainer>
