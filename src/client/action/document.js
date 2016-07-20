@@ -99,7 +99,7 @@ export const updateWorkspace = createAction(UPDATE_WORKSPACE,
     schema: Document
   }));
 export const deleteWorkspace = createAction(DELETE_WORKSPACE,
-  (id) => api(DELETE, `/documents/${id}/workspace`, {
+  document => api(DELETE, `/documents/${document.id}/workspace`, {
     plain: true
   }),
   document => ({
@@ -109,10 +109,7 @@ export function load(name) {
   return (dispatch, getState) => {
     const { entities: { documents } } = getState();
     const entry = documents[name];
-    if (entry != null && entry.devices !== undefined &&
-      // Push notification is not done yet
-      new Date().valueOf() - entry.loadedAt < 0
-    ) {
+    if (entry != null && entry.devices !== undefined) {
       return Promise.resolve();
     }
     return dispatch(fetch(name));
@@ -124,6 +121,16 @@ export function loadList() {
     if (document.load && document.load.loading) return Promise.resolve();
     if (!document.loaded) return dispatch(fetchList());
     return Promise.resolve();
+  };
+}
+export function loadWorkspace(id) {
+  return (dispatch, getState) => {
+    const { entities: { documents } } = getState();
+    const entry = documents[id];
+    if (entry != null && entry.workspace !== undefined) {
+      return Promise.resolve();
+    }
+    return dispatch(fetchWorkspace({id}));
   };
 }
 
@@ -142,6 +149,54 @@ export function confirmDocumentDelete(document) {
           name: 'Yes',
           type: 'red',
           action: [goBack(), documentDelete(document)]
+        },
+        {
+          name: 'No'
+        }
+      ]
+    }));
+  };
+}
+
+export function confirmDeleteWorkspace(document) {
+  return (dispatch) => {
+    dispatch(modalOpen({
+      title: 'ConfirmDeleteWorkspaceTitle',
+      body: {
+        key: 'ConfirmDeleteWorkspaceDesc',
+        value: [
+          document.name
+        ]
+      },
+      choices: [
+        {
+          name: 'Yes',
+          type: 'orange',
+          action: [deleteWorkspace(document)]
+        },
+        {
+          name: 'No'
+        }
+      ]
+    }));
+  };
+}
+
+export function confirmUpdatePayload(document, code) {
+  return (dispatch) => {
+    dispatch(modalOpen({
+      title: 'ConfirmUpdatePayloadTitle',
+      body: {
+        key: 'ConfirmUpdatePayloadDesc',
+        value: [
+          document.name
+        ]
+      },
+      choices: [
+        {
+          name: 'Yes',
+          type: 'green',
+          action: [updatePayload(document.id, code)]
         },
         {
           name: 'No'

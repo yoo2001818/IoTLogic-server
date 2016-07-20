@@ -42,6 +42,14 @@
   }
 }
 
+.save-icon {
+  @include fa-icon();
+  vertical-align: middle;
+  &:before {
+    content: $fa-var-floppy-o;
+  }
+}
+
 .trash-icon {
   @include fa-icon();
   &:before {

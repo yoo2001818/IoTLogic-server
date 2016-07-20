@@ -8,11 +8,43 @@
     left: 0;
     right: 0;
     height: 2.4em;
-    background-color: $grey-800;
+    background-color: $grey-200;
     border-bottom: 1px solid $grey-700;
-    color: $grey-100;
+    color: $grey-700;
     line-height: 2.4em;
-    padding: 0 1em;
+    padding: 0 0.4em;
+    & > button {
+      background-color: transparent;
+      padding: 0.5em 0.6em;
+      color: $blue-800;
+      &:disabled {
+        color: $grey-800;
+        &:hover {
+          background-color: transparent;
+        }
+      }
+      &:hover {
+        background-color: $grey-100;
+      }
+      &.orange, &.green {
+        background-color: transparent;
+        &:hover {
+          background-color: $grey-100;
+        }
+        &:disabled {
+          color: $grey-800;
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+      &.orange {
+        color: $orange-800;
+      }
+      &.green {
+        color: $green-800;
+      }
+    }
   }
   & > .editor {
     position: absolute;
