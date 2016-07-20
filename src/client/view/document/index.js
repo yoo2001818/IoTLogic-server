@@ -1,15 +1,16 @@
 import React, { Component, PropTypes } from 'react';
 
+import DocumentEntryForm from '../../container/form/documentEntryForm';
+
 export default class DocumentEntryIndex extends Component {
   render() {
     const { document } = this.props;
     return (
       <div className='document-entry-view general-view'>
-        <div className='content'>
-          <pre>
-            {JSON.stringify(document, null, 2)}
-          </pre>
-        </div>
+        <DocumentEntryForm className='content noborder-input'
+          initialValues={document} formKey={'id/'+document.id}
+          document={document}
+        />
       </div>
     );
   }

@@ -69,9 +69,10 @@ export default class SelectInput extends Component {
             className={classNames('option', {
               selected: option.value === value,
               focus: option.value === value && isFocused
-            })}
+            }, option.className)}
             onClick={this.handleSelect.bind(this, option.value)}
           >
+            {option.value === value && <span className='icon' />}
             {option.label}
           </li>
         ))}

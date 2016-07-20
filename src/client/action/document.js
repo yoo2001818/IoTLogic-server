@@ -2,6 +2,8 @@ import { createAction } from 'redux-actions';
 import { arrayOf } from 'normalizr';
 import { Document } from '../schema/index';
 import { api, GET, POST, DELETE } from '../middleware/api';
+import { goBack } from 'react-router-redux';
+import { open as modalOpen } from './modal';
 
 export const FETCH_LIST = 'document/fetchList';
 export const FETCH = 'document/fetch';
@@ -122,5 +124,29 @@ export function loadList() {
     if (document.load && document.load.loading) return Promise.resolve();
     if (!document.loaded) return dispatch(fetchList());
     return Promise.resolve();
+  };
+}
+
+export function confirmDocumentDelete(document) {
+  return (dispatch) => {
+    dispatch(modalOpen({
+      title: 'ConfirmDocumentDeleteTitle',
+      body: {
+        key: 'ConfirmDocumentDeleteDesc',
+        value: [
+          document.name
+        ]
+      },
+      choices: [
+        {
+          name: 'Yes',
+          type: 'red',
+          action: [goBack(), documentDelete(document)]
+        },
+        {
+          name: 'No'
+        }
+      ]
+    }));
   };
 }

@@ -17,11 +17,7 @@ import ErrorInput from '../../component/ui/errorInput';
 import DocumentSpan from '../../component/documentSpan';
 
 import __ from '../../lang';
-
-function capitalize(str) {
-  if (str == null || str.length === 0) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import capitalize from '../../util/capitalize';
 
 class DeviceEntryForm extends Component {
   handleDelete(e) {
@@ -45,7 +41,7 @@ class DeviceEntryForm extends Component {
     return (
         <div className={classNames('device-entry-form', className)}>
           <form onSubmit={onSubmit}>
-            <Section title={__('DeviceInfoSection')}>
+            <Section title={__('InfoSection')}>
               <Field label={__('DeviceNameLabel')}>
                 <ErrorInput type='text' placeholder={__('DeviceNameLabel')}
                   {...name}
@@ -59,6 +55,12 @@ class DeviceEntryForm extends Component {
               <Field label={__('DeviceTypeLabel')}>
                 <div className='readonly'>
                   {__('DeviceType' + capitalize(type.value))}
+                </div>
+              </Field>
+              <Field label={__('DeviceConnectedLabel')}>
+                <div className='readonly'>
+                  {device.connected ? __('DeviceConnected') :
+                    __('DeviceDisconnected')}
                 </div>
               </Field>
               <Field label={__('CreatedDateLabel')}>
@@ -80,14 +82,6 @@ class DeviceEntryForm extends Component {
                   {__('Save')}
                 </Button>
               </div>
-            </Section>
-            <Section title={__('DeviceStatusSection')}>
-              <Field label={__('DeviceConnectedLabel')}>
-                <div className='readonly'>
-                  {device.connected ? __('DeviceConnected') :
-                    __('DeviceDisconnected')}
-                </div>
-              </Field>
             </Section>
             <Section title={__('DeviceDocumentSection')}>
               <ul className='device-list'>
