@@ -66,6 +66,7 @@
   "SourceUpload": "업로드",
   "DocumentSourceSection": "스크립트",
   "DocumentSourceSectionHelp": "위의 드롭다운 메뉴를 열어 스크립트 편집기로 이동할 수 있습니다.",
+  "DocumentDeviceSection": "연결된 장치",
   "ErrorUsernameInvalid": "존재하지 않는 아이디입니다",
   "ErrorPasswordInvalid": "비밀번호가 틀립니다",
   "ErrorValidationUsernamePolicy": "알파벳과 숫자만 사용할 수 있습니다",

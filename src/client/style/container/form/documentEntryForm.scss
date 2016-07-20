@@ -1,0 +1,54 @@
+.document-entry-form {
+  .status-drop-down {
+    a {
+      color: $grey-700;
+    }
+    & > .button .title {
+      padding: 0.3em;
+      text-align: right;
+    }
+    & > .content > ul > li {
+      display: block;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.5em 1em;
+      border-radius: 0;
+      border: none;
+      background-color: $grey-100;
+      color: $grey-700;
+      & > .icon {
+        display: none;
+      }
+      &.selected, &.selected.focus {
+        border: none;
+        background-color: $blue-600;
+        color: $blue-100;
+      }
+      &:hover, &.focus {
+        background-color: $blue-200;
+        color: $blue-800;
+      }
+    }
+  }
+  .device-list {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    & > li > a {
+      display: block;
+      padding: 0.4em 0.8em;
+      font-size: 1em;
+      color: $grey-800;
+      text-decoration: none;
+      box-sizing: border-box;
+      border-bottom: 1px solid $grey-400;
+      &:hover {
+        background-color: $blue-200;
+        color: $blue-800;
+      }
+    }
+    & > li:last-child > a {
+      border: none;
+    }
+  }
+}

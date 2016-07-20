@@ -12,6 +12,7 @@ import Section from '../../component/ui/section';
 import Field from '../../component/ui/field';
 import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';
+import DropDown from '../../component/ui/dropDown';
 import SelectInput from '../../component/ui/selectInput';
 
 import __ from '../../lang';
@@ -51,12 +52,17 @@ class DocumentEntryForm extends Component {
                 />
               </Field>
               <Field label={__('DocumentStatus')}>
-                <SelectInput {...state} options={[
-                  {value: 'start', label: __('DocumentStatusStart'),
-                    className: 'green'},
-                  {value: 'stop', label: __('DocumentStatusStop'),
-                    className: 'red'},
-                ]} />
+                <DropDown title={state.value === 'start' ?
+                  __('DocumentStatusStart') : __('DocumentStatusStop')}
+                  className='status-drop-down left'
+                >
+                  <SelectInput {...state} options={[
+                    {value: 'start', label: __('DocumentStatusStart'),
+                      className: 'green'},
+                    {value: 'stop', label: __('DocumentStatusStop'),
+                      className: 'red'},
+                  ]} className='menu-list' />
+                </DropDown>
               </Field>
               {/*Field label={__('DocumentVisibility')}>
                 <SelectInput {...visibility} options={[
