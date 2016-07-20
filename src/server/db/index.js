@@ -110,13 +110,17 @@ export const Document = sequelize.define('document', inject({
   }
 });
 
+export const DeviceDocumentLink = sequelize.define('deviceDocumentLink', {
+  position: Sequelize.INTEGER
+});
+
 User.hasMany(Device);
 User.hasMany(Document);
 
 Device.belongsTo(User);
 Document.belongsTo(User);
 
-Document.belongsToMany(Device, {through: 'DeviceDocument'});
-Device.belongsToMany(Document, {through: 'DeviceDocument'});
+Document.belongsToMany(Device, {through: 'deviceDocumentLink'});
+Device.belongsToMany(Document, {through: 'deviceDocumentLink'});
 
 sequelize.sync();

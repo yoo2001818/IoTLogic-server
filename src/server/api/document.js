@@ -2,7 +2,7 @@ import Express from 'express';
 import loginRequired from './lib/loginRequired';
 import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
-import { Device, Document, User } from '../db';
+import { Device, Document, User, DeviceDocumentLink } from '../db';
 import pick from '../util/pick';
 
 function resolveDevices(req, res, next) {
@@ -27,18 +27,18 @@ function resolveDevices(req, res, next) {
   })
   .then(models => {
     // Check if each device exists..
-    models.forEach(model => {
-      let index = devices.indexOf(model.name);
-      if (index === -1) throw new Error('Unknown device returned');
-      devices.splice(index, 1);
-    });
-    if (devices.length > 0) {
+    let output = devices.map(name => models.find(model => model.name === name));
+    if (output.some(device => device == null)) {
       res.status(400);
       res.json(Object.assign({}, errorCode.noSuchDevice, {
         name: devices[0]
       }));
+      return;
     }
-    req.devices = models;
+    output.forEach((device, position) => device.deviceDocumentLink = {
+      position
+    });
+    req.devices = output;
     next();
   })
   .catch(error => handleDBError(error, req, res, next));
@@ -57,8 +57,12 @@ function ensureOwnership(req, res, next) {
 
 function stripDevices(data, isJSON = false) {
   let json = isJSON ? data : data.toJSON();
+  let devicesJSON = json.devices.slice() || [];
+  devicesJSON.sort((a, b) => {
+    return a.deviceDocumentLink.position - b.deviceDocumentLink.position;
+  });
   let obj = Object.assign({}, json, {
-    devices: (json.devices || []).map(v => ({
+    devices: devicesJSON.map(v => ({
       id: v.id,
       name: v.name
     })),
@@ -67,7 +71,7 @@ function stripDevices(data, isJSON = false) {
       username: json.user.username
     },
   });
-  delete obj.DeviceDocument;
+  delete obj.deviceDocumentLink;
   return obj;
 }
 

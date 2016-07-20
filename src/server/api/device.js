@@ -11,7 +11,7 @@ export default router;
 
 function stripAssociation(document) {
   let json = Object.assign({}, document);
-  delete json.DeviceDocument;
+  delete json.deviceDocumentLink;
   return json;
 }
 

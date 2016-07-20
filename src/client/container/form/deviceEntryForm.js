@@ -84,6 +84,9 @@ class DeviceEntryForm extends Component {
               </div>
             </Section>
             <Section title={__('DeviceDocumentSection')}>
+              {documents.length === 0 && (
+                <p className='tip'>{__('DeviceDocumentListEmptyTip')}</p>
+              )}
               <ul className='device-list'>
                 {documents.map(document => (
                   <li key={document.id}>

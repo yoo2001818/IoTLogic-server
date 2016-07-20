@@ -44,6 +44,7 @@
   "DeviceDelete": "삭제",
   "ConfirmDeviceDeleteTitle": "장치 삭제 확인",
   "ConfirmDeviceDeleteDesc": "정말 '$1' 장치를 삭제할까요? 추가하려면 해당 장치에서 다시 설정을 해야합니다.",
+  "DeviceDocumentListEmptyTip": "연결된 스크립트가 없습니다.",
   "Save": "저장",
   "Yes": "네",
   "No": "아니요",
