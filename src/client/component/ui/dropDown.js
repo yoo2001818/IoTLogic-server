@@ -73,14 +73,10 @@ export default class DropDown extends Component {
         >
           {buttonContent}
         </div>
-        <div className='content'>
-          { this.props.preventClose ? (
-            this.props.children
-          ) : (
-            cloneElement(this.props.children, {
-              onClick: this.handleClick.bind(this)
-            })
-          ) }
+        <div className='content' onClick={this.props.preventClose ?
+          undefined : this.handleClick.bind(this)}
+        >
+          { this.props.children }
         </div>
       </div>
     );

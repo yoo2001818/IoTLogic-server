@@ -34,17 +34,59 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
-    & > li > a {
-      display: block;
-      padding: 0.4em 0.8em;
-      font-size: 1em;
-      color: $grey-800;
-      text-decoration: none;
-      box-sizing: border-box;
-      border-bottom: 1px solid $grey-400;
-      &:hover {
-        background-color: $blue-200;
-        color: $blue-800;
+    &.unadded {
+      margin-top: 0.5em;
+      padding-top: 0.5em;
+      border-top: 1px solid $orange-800;
+    }
+    & > .tip {
+      color: $grey-700;
+      font-size: 0.85em;
+    }
+    & > li {
+      position: relative;
+      & > .remove-btn, & > .add-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 0.8em;
+        line-height: 1.4rem;
+        padding: 0.4em 0;
+        width: 2em;
+        cursor: pointer;
+      }
+      & > .remove-btn {
+        color: $red-800;
+        &:hover {
+          color: $red-600;
+          background-color: $red-200;
+        }
+      }
+      & > .add-btn {
+        color: $green-800;
+        &:hover {
+          color: $green-600;
+          background-color: $green-200;
+        }
+      }
+      & > .device-span {
+        display: block;
+        position: relative;
+        margin-right: 2em;
+        padding: 0.4em 0.8em;
+        font-size: 1em;
+        line-height: 1.3rem;
+        color: $grey-800;
+        text-decoration: none;
+        box-sizing: border-box;
+        border-bottom: 1px solid $grey-400;
+        &:hover {
+          background-color: $blue-200;
+          color: $blue-800;
+        }
       }
     }
     & > li:last-child > a {

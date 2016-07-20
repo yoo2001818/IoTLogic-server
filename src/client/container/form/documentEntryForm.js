@@ -14,6 +14,7 @@ import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';
 import DropDown from '../../component/ui/dropDown';
 import SelectInput from '../../component/ui/selectInput';
+import DeviceList from '../deviceList';
 
 import __ from '../../lang';
 
@@ -24,6 +25,10 @@ class DocumentEntryForm extends Component {
   }
   handleSubmit(values) {
     return this.props.documentUpdate(this.props.document.id, values);
+  }
+  handleReset(e) {
+    e.preventDefault();
+    this.props.resetForm();
   }
   handleUpload() {
     let fileList = this.fileInput.files;
@@ -113,17 +118,24 @@ class DocumentEntryForm extends Component {
               </div>
             </Section>
             <Section title={__('DocumentDeviceSection')}>
-              <ul className='device-list'>
-              </ul>
+              <DeviceList {...devices} />
+              <div className='section-action'>
+                {dirty && (
+                  <Button className='orange' div
+                    onClick={this.handleReset.bind(this)}
+                  >
+                    <span className='undo-icon icon-right' />
+                    {__('Revert')}
+                  </Button>
+                )}
+                <Button onClick={onSubmit} disabled={!dirty || invalid ||
+                  submitting}
+                >
+                  <span className='check-icon icon-right'  />
+                  {__('Save')}
+                </Button>
+              </div>
             </Section>
-            {/*
-            <Section title={__('DocumentPlatformSection')}>
-              Work in progress
-            </Section>
-            */}
-            <pre>
-              {JSON.stringify(document, null, 2)}
-            </pre>
           </form>
         </div>
     );
@@ -140,7 +152,8 @@ DocumentEntryForm.propTypes = {
   className: PropTypes.string,
   confirmDocumentDelete: PropTypes.func,
   documentUpdate: PropTypes.func,
-  updatePayload: PropTypes.func
+  updatePayload: PropTypes.func,
+  resetForm: PropTypes.func
 };
 
 export default reduxForm({
@@ -153,7 +166,5 @@ export default reduxForm({
   validate: (values) => {
     return validate(values, Document, true);
   }
-}, (state, props) => {
-  console.log(props);
-  return {};
-}, { confirmDocumentDelete, documentUpdate, updatePayload })(DocumentEntryForm);
+}, null, { confirmDocumentDelete, documentUpdate, updatePayload }
+)(DocumentEntryForm);

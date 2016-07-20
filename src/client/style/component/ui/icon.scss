@@ -18,6 +18,10 @@
   }
 }
 
+.icon-left {
+  margin-left: 0.3em;
+}
+
 .icon-right {
   margin-right: 0.3em;
 }
@@ -42,6 +46,27 @@
   @include fa-icon();
   &:before {
     content: $fa-var-trash;
+  }
+}
+
+.minus-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-minus;
+  }
+}
+
+.plus-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-plus;
+  }
+}
+
+.undo-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-undo;
   }
 }
 
