@@ -6,7 +6,20 @@ export default class Button extends Component {
     if (this.props.onClick) this.props.onClick(event);
   }
   render() {
-    const { className, children, disabled, div } = this.props;
+    const { className, children, disabled, div, href, tabIndex } = this.props;
+    if (href) {
+      return (
+        <a
+          href={href}
+          className={classNames('button-component', className)}
+          onClick={this.handleClick.bind(this)}
+          disabled={disabled}
+          ref={v => this.button = v}
+        >
+          {children}
+        </a>
+      );
+    }
     if (div) {
       return (
         <div
@@ -14,6 +27,7 @@ export default class Button extends Component {
           onClick={this.handleClick.bind(this)}
           disabled={disabled}
           ref={v => this.button = v}
+          tabIndex={tabIndex == null ? -1 : tabIndex}
         >
           {children}
         </div>
@@ -37,5 +51,7 @@ Button.propTypes = {
   className: PropTypes.string,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  div: PropTypes.bool
+  div: PropTypes.bool,
+  href: PropTypes.string,
+  tabIndex: PropTypes.number
 };

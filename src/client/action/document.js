@@ -65,7 +65,7 @@ export const fetchPayload = createAction(FETCH_PAYLOAD,
     relation: ['documents', document.id, 'payload']
   }));
 export const updatePayload = createAction(UPDATE_PAYLOAD,
-  (id, code) => api(POST, `/documents/${id}`, {
+  (id, code) => api(POST, `/documents/${id}/payload`, {
     body: {
       payload: code
     },

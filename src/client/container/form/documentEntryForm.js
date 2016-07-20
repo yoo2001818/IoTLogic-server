@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import classNames from 'classnames';
 
-import { confirmDocumentDelete, update as documentUpdate }
+import { confirmDocumentDelete, update as documentUpdate, updatePayload }
   from '../../action/document';
 
 import { Document } from '../../../validation/schema';
@@ -24,8 +24,19 @@ class DocumentEntryForm extends Component {
   handleSubmit(values) {
     return this.props.documentUpdate(this.props.document.id, values);
   }
+  handleUpload() {
+    let fileList = this.fileInput.files;
+    if (fileList.length === 0) return;
+    let file = fileList[0];
+    let reader = new FileReader();
+    reader.onload = () => {
+      if (!reader.result) return;
+      this.props.updatePayload(this.props.document.id, reader.result);
+    };
+    reader.readAsText(file);
+  }
   render() {
-    const { fields: { name, visibility, state, devices },
+    const { fields: { name, state, devices },
       handleSubmit, invalid, submitting, className, dirty, document }
       = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
@@ -47,19 +58,19 @@ class DocumentEntryForm extends Component {
                     className: 'red'},
                 ]} />
               </Field>
-              <Field label={__('DocumentVisibility')}>
+              {/*Field label={__('DocumentVisibility')}>
                 <SelectInput {...visibility} options={[
                   {value: 'public', label: __('DocumentVisibilityPublic')},
                   {value: 'private', label: __('DocumentVisibilityPrivate')},
                 ]} />
-              </Field>
+              </Field>*/}
               <Field label={__('CreatedDateLabel')}>
                 <div className='readonly'>
                   {new Date(document.createdAt).toLocaleString()}
                 </div>
               </Field>
               <div className='section-action'>
-                <Button className='red' div
+                <Button className='red' div noFocus
                   onClick={this.handleDelete.bind(this)}
                 >
                   <span className='trash-icon icon-right' />
@@ -73,7 +84,29 @@ class DocumentEntryForm extends Component {
                 </Button>
               </div>
             </Section>
-            <Section title={__('DocumentDocumentSection')}>
+            <Section title={__('DocumentSourceSection')}>
+              <p className='tip'>{__('DocumentSourceSectionHelp')}</p>
+              <div className='section-action'>
+                <label>
+                  <input type='file' className='file-input'
+                    accept='.txt,.scm,.scheme,.ss'
+                    ref={input => this.fileInput = input}
+                    onChange={this.handleUpload.bind(this)}
+                  />
+                  <Button className='orange' div>
+                    <span className='upload-icon icon-right' />
+                    {__('SourceUpload')}
+                  </Button>
+                </label>
+                <Button className='green'
+                  href={`/api/documents/${document.id}/payload`}
+                >
+                  <span className='download-icon icon-right' />
+                  {__('SourceDownload')}
+                </Button>
+              </div>
+            </Section>
+            <Section title={__('DocumentDeviceSection')}>
               <ul className='device-list'>
               </ul>
             </Section>
@@ -100,7 +133,8 @@ DocumentEntryForm.propTypes = {
   document: PropTypes.object,
   className: PropTypes.string,
   confirmDocumentDelete: PropTypes.func,
-  documentUpdate: PropTypes.func
+  documentUpdate: PropTypes.func,
+  updatePayload: PropTypes.func
 };
 
 export default reduxForm({
@@ -116,4 +150,4 @@ export default reduxForm({
 }, (state, props) => {
   console.log(props);
   return {};
-}, { confirmDocumentDelete, documentUpdate })(DocumentEntryForm);
+}, { confirmDocumentDelete, documentUpdate, updatePayload })(DocumentEntryForm);

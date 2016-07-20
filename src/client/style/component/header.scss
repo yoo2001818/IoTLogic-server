@@ -27,6 +27,7 @@
     color: $header-color;
     text-decoration: none;
     &:hover {
+      color: $header-color;
       text-decoration: underline;
     }
   }

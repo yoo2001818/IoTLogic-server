@@ -21,3 +21,14 @@ html {
     font-size: 13pt;
   }
 }
+
+a {
+  color: $blue-800;
+  &:hover {
+    color: $blue-700;
+  }
+}
+
+input.file-input {
+  display: none;
+}

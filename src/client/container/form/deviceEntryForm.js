@@ -69,7 +69,7 @@ class DeviceEntryForm extends Component {
                 </div>
               </Field>
               <div className='section-action'>
-                <Button className='red' div
+                <Button className='red' div noFocus
                   onClick={this.handleDelete.bind(this)}
                 >
                   <span className='trash-icon icon-right' />

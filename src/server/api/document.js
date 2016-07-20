@@ -160,6 +160,7 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
 
 router.get('/documents/:id/payload', (req, res) => {
   res.type('text/plain');
+  res.attachment(req.document.name + '.scm');
   res.send(req.document.payload);
 });
 
@@ -171,7 +172,7 @@ router.post('/documents/:id/payload', ensureOwnership, (req, res, next) => {
     payload = req.document.payloadTemp;
     if (payload == null) {
       res.type('text/plain');
-      res.json(payload);
+      res.send(payload);
       return;
     }
   }
@@ -185,6 +186,7 @@ router.post('/documents/:id/payload', ensureOwnership, (req, res, next) => {
 
 router.get('/documents/:id/workspace', (req, res) => {
   res.type('text/plain');
+  res.attachment(req.document.name + '.scm');
   if (req.document.payloadTemp) {
     res.send(req.document.payloadTemp);
     return;
