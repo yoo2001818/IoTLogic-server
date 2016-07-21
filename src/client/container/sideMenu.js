@@ -11,7 +11,7 @@ import __ from '../lang';
 export default class SideMenu extends Component {
   render() {
     return (
-      <div>
+      <div className='side-menu' >
         <SidebarHeader left={__('SidebarTitle')} />
         <div className='content'>
           <div className='sidebar-entry'>

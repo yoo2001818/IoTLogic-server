@@ -46,7 +46,6 @@ export default class MessageServer {
         return;
       }
 
-      console.log(data);
       // TODO We should push notification to web clients
       // Also, multiprocess load-balancing would require Redis or something
       // to share the socket status (This is same for the messaging server!)
@@ -93,7 +92,7 @@ export default class MessageServer {
       console.log((err && err.stack) || err);
     });
     this.router.on('connect', () => {
-      console.log('Connected!');
+      debug('Connected!');
     });
     this.router.on('disconnect', (name, clientId) => {
       if (name === true) {
@@ -113,29 +112,30 @@ export default class MessageServer {
           this.router.removeSynchronizer(name);
         }
       }
-      console.log('Disconnected!');
+      debug('Disconnected!');
     });
     this.router.on('freeze', () => {
-      console.log('Synchronizer frozen');
+      debug('Synchronizer frozen');
     });
     this.router.on('unfreeze', () => {
-      console.log('Synchronizer unfrozen');
+      debug('Synchronizer unfrozen');
     });
 
     this.connector.start();
   }
   updateDevice(device) {
     debug('Handling updated device ' + device.name);
-    let data = device.toJSON();
+    // let data = device.toJSON();
     // Disconnect and reconnect from connected nodes
     let clientId = this.dbClients[device.id];
     if (clientId == null) return;
     for (let key in this.router.synchronizers) {
       let synchronizer = this.router.synchronizers[key];
       if (synchronizer.clients[clientId] != null) {
-        // TODO Send disconnect
+        this.connector.disconnect(clientId);
         synchronizer.handleDisconnect(clientId);
-        synchronizer.handleConnect(data, clientId);
+        // TODO Meh. it'll reconnect anyway.
+        // synchronizer.handleConnect(data, clientId);
       }
     }
   }
@@ -145,6 +145,7 @@ export default class MessageServer {
     if (clientId == null) return;
     // Disconnect from main
     this.connector.disconnect(clientId);
+    this.router.handleDisconnect(clientId);
   }
   addDocument(document) {
     debug('Handling added document ' + document.name);
@@ -216,7 +217,9 @@ export default class MessageServer {
       ) {
         // Disconnect node
         debug('Disconnecting client ' + client.id);
-        // TODO Send disconnect
+        this.connector.push({
+          name: docId, disconnect: true
+        }, client.id);
         synchronizer.handleDisconnect(client.id);
       }
     });
@@ -230,7 +233,9 @@ export default class MessageServer {
       if (client.id !== this.connector.getClientId()) {
         // Disconnect node
         debug('Disconnecting client ' + client.id);
-        // TODO Send disconnect
+        this.connector.push({
+          name: docId, disconnect: true
+        }, client.id);
         synchronizer.handleDisconnect(client.id);
       }
     });
