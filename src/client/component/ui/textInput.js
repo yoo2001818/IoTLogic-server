@@ -8,6 +8,7 @@ export default class TextInput extends Component {
         type='text'
         {...this.props}
         className={classNames('text-input-component', this.props.className)}
+        ref={v => this.input = v}
       />
     );
   }

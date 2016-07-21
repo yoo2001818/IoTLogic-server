@@ -13,6 +13,7 @@ import Section from '../../component/ui/section';
 import Field from '../../component/ui/field';
 import Button from '../../component/ui/button';
 import ErrorInput from '../../component/ui/errorInput';
+import ListInput from '../../component/ui/listInput';
 
 import DocumentSpan from '../../component/documentSpan';
 
@@ -32,8 +33,12 @@ class DeviceEntryForm extends Component {
       if (changed) this.props.replace('/devices/' + v.payload.result);
     });
   }
+  handleReset(e) {
+    e.preventDefault();
+    this.props.resetForm();
+  }
   render() {
-    const { fields: { name, alias, type },
+    const { fields: { name, alias, type, data },
       handleSubmit, invalid, submitting, device, className, dirty, documents }
       = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
@@ -95,11 +100,29 @@ class DeviceEntryForm extends Component {
                 ))}
               </ul>
             </Section>
-            {/*
-            <Section title={__('DevicePlatformSection')}>
-              Work in progress
-            </Section>
-            */}
+            { device.type === 'pc' && (
+              <Section title={__('AsyncIOPackagesLabel')}>
+                <ListInput {...data}
+                  value={Array.isArray(data.value) ? data.value : []}
+                />
+                <div className='section-action'>
+                  {dirty && (
+                    <Button className='orange' div
+                      onClick={this.handleReset.bind(this)}
+                    >
+                      <span className='undo-icon icon-right' />
+                      {__('Revert')}
+                    </Button>
+                  )}
+                  <Button onClick={onSubmit} disabled={!dirty || invalid ||
+                    submitting}
+                  >
+                    <span className='check-icon icon-right'  />
+                    {__('Save')}
+                  </Button>
+                </div>
+              </Section>
+            )}
           </form>
         </div>
     );
@@ -117,12 +140,13 @@ DeviceEntryForm.propTypes = {
   className: PropTypes.string,
   confirmDeviceDelete: PropTypes.func,
   deviceUpdate: PropTypes.func,
-  replace: PropTypes.func
+  replace: PropTypes.func,
+  resetForm: PropTypes.func
 };
 
 export default reduxForm({
   form: 'deviceEntry',
-  fields: ['name', 'alias', 'type'],
+  fields: ['name', 'alias', 'type', 'data'],
   validate: (values) => {
     return validate(values, Device, true);
   }
