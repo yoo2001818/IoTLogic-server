@@ -26,7 +26,7 @@ export default function device(state = {
       list: (state.list || []).map(
         v => v === meta.previous ? payload.result : v)
     });
-  case DeviceActions.DELETE_DEVICE:
+  case DeviceActions.DEVICE_DELETE:
     if (error) return state;
     return Object.assign({}, newState, {
       list: (state.list || []).filter(v => v !== payload.result)

@@ -97,16 +97,16 @@ router.post('/documents', loginRequired, resolveDevices, (req, res, next) => {
       if (req.devices != null) {
         return document.setDevices(req.devices)
         .then(() => {
-          return Object.assign({}, document.toJSON(), {
-            devices: req.devices || []
+          return Document.findById(document.id, {
+            include: [ Device, User ]
           });
         });
       } else {
-        return document.toJSON();
+        return document;
       }
     }).then(document => {
       req.app.locals.messageServer.addDocument(document);
-      res.json(stripDevices(document, true));
+      res.json(stripDevices(document));
     });
   }).catch(error => handleDBError(error, req, res, next));
 });
@@ -150,16 +150,16 @@ router.post('/documents/:id', ensureOwnership, resolveDevices,
     if (req.devices != null) {
       return document.setDevices(req.devices)
       .then(() => {
-        return Object.assign({}, document.toJSON(), {
-          devices: req.devices || []
+        return Document.findById(document.id, {
+          include: [ Device, User ]
         });
       });
     } else {
-      return document.toJSON();
+      return document;
     }
   }).then(document => {
     req.app.locals.messageServer.updateDocument(document);
-    res.json(stripDevices(document, true));
+    res.json(stripDevices(document));
   }).catch(error => handleDBError(error, req, res, next));
 });
 
