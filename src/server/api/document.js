@@ -2,7 +2,7 @@ import Express from 'express';
 import loginRequired from './lib/loginRequired';
 import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
-import { Device, Document, User, DeviceDocumentLink } from '../db';
+import { Device, Document, User } from '../db';
 import pick from '../util/pick';
 
 function resolveDevices(req, res, next) {
@@ -94,8 +94,19 @@ router.post('/documents', loginRequired, resolveDevices, (req, res, next) => {
     return document.setDevices(req.devices || [])
     .then(() => {
       document.devices = req.devices || [];
+      if (req.devices != null) {
+        return document.setDevices(req.devices)
+        .then(() => {
+          return Object.assign({}, document.toJSON(), {
+            devices: req.devices || []
+          });
+        });
+      } else {
+        return document.toJSON();
+      }
+    }).then(document => {
       req.app.locals.messageServer.addDocument(document);
-      res.json(stripDevices(document));
+      res.json(stripDevices(document, true));
     });
   }).catch(error => handleDBError(error, req, res, next));
 });

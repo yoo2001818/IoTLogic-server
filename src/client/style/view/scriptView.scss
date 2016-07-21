@@ -8,7 +8,7 @@
     left: 0;
     right: 0;
     height: 2.4em;
-    background-color: $grey-200;
+    background-color: $grey-100;
     border-bottom: 1px solid $grey-700;
     color: $grey-700;
     line-height: 2.4em;
@@ -24,12 +24,12 @@
         }
       }
       &:hover {
-        background-color: $grey-100;
+        background-color: $grey-200;
       }
       &.orange, &.green {
         background-color: transparent;
         &:hover {
-          background-color: $grey-100;
+          background-color: $grey-200;
         }
         &:disabled {
           color: $grey-800;

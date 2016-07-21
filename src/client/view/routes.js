@@ -12,6 +12,7 @@ import DocumentEntryConsole from './document/console';
 import NewDocument from './newDocument';
 import NewDevice from './newDevice';
 import NewDevicePC from './newDevice/pc';
+import Setting from './setting';
 import NotFound from './notFound';
 
 export default (
@@ -37,6 +38,7 @@ export default (
         <Route path='pc' component={NewDevicePC} />
       </Route>
     </Route>
+    <Route path='setting' component={Setting} />
     <Route path='*' component={NotFound} />
   </Route>
 );
