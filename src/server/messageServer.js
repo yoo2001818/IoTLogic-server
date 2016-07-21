@@ -32,11 +32,20 @@ export default class MessageServer {
         });
       }
     });
-    this.router = new Router(this.connector, true, (_, clientId) => {
+    this.router = new Router(this.connector, true, (provided, clientId) => {
       debug('Connection established with ' + clientId);
       // Ignore data from the client; We've already loaded device info
       let device = this.connector.clients[clientId].upgradeReq.device;
       let data = device.toJSON();
+
+      if (provided && provided.initialized === false) {
+        // Wait for dependency installation
+        this.router.connector.connect({
+          global: true, data
+        }, clientId);
+        return;
+      }
+
       console.log(data);
       // TODO We should push notification to web clients
       // Also, multiprocess load-balancing would require Redis or something

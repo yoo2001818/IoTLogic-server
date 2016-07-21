@@ -37,7 +37,7 @@ function ensureDevice(req, res, next) {
 router.get('/devices', loginRequired, (req, res, next) => {
   req.user.getDevices({
     attributes: {
-      exclude: ['createdAt', 'updatedAt', 'userId']
+      exclude: ['createdAt', 'updatedAt', 'userId', 'data']
     }
   })
   .then(devices => {
@@ -47,6 +47,7 @@ router.get('/devices', loginRequired, (req, res, next) => {
 
 router.post('/devices/', loginRequired, (req, res, next) => {
   let data = pick(req.body, ['name', 'alias', 'type', 'data'], true);
+  if (data.data !== undefined) data.data = JSON.stringify(data.data);
   Device.create(Object.assign(data, {
     userId: req.user.id,
     token: randomstring.generate()
@@ -86,6 +87,7 @@ router.get('/devices/:name', ensureDevice, (req, res) => {
 
 router.post('/devices/:name', ensureDevice, (req, res, next) => {
   let data = pick(req.body, ['name', 'alias', 'type', 'data'], true);
+  if (data.data !== undefined) data.data = JSON.stringify(data.data);
   req.device.update(data)
   .then(device => {
     req.app.locals.messageServer.updateDevice(device);

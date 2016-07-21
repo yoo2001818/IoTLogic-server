@@ -60,7 +60,10 @@ export const Device = sequelize.define('device', inject({
     type: Sequelize.STRING,
     allowNull: false
   },
-  data: Sequelize.TEXT,
+  data: {
+    type: Sequelize.TEXT,
+    defaultValue: 'null' // :P
+  },
   token: {
     type: Sequelize.STRING,
     allowNull: false,
@@ -77,6 +80,13 @@ export const Device = sequelize.define('device', inject({
         plain: true
       });
       delete obj.token;
+      if (obj.data != null) {
+        try {
+          obj.data = JSON.parse(obj.data);
+        } catch (e) {
+          // Do nothing
+        }
+      }
       return obj;
     }
   }
