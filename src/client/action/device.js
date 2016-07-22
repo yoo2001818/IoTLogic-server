@@ -38,6 +38,7 @@ export const create = createAction(CREATE,
     body: device
   }),
   () => ({
+    errors: [400, 409],
     schema: Device
   }));
 export const update = createAction(UPDATE,
@@ -47,10 +48,12 @@ export const update = createAction(UPDATE,
   (name, device) => {
     if (name === device.name || device.name === undefined) {
       return {
+        errors: [400, 409],
         schema: Device
       };
     }
     return {
+      errors: [400, 409],
       append: {
         devices: {
           [name]: {
@@ -65,11 +68,10 @@ export const update = createAction(UPDATE,
 
 export function load(name) {
   return (dispatch, getState) => {
-    const { entities: { devices } } = getState();
+    const { entities: { devices }, user: { username } } = getState();
     const entry = devices[name];
-    if (entry != null && entry.documents !== undefined &&
-      // Push notification is not done yet
-      new Date().valueOf() - entry.loadedAt < 0
+    if (entry != null && entry.documents !== undefined
+      && entry.user === username
     ) {
       return Promise.resolve();
     }

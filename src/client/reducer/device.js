@@ -26,6 +26,11 @@ export default function device(state = {
       list: (state.list || []).map(
         v => v === meta.previous ? payload.result : v)
     });
+  case DeviceActions.CREATE:
+    if (error) return state;
+    return Object.assign({}, newState, {
+      list: (state.list || []).concat(payload.result)
+    });
   case DeviceActions.DEVICE_DELETE:
     if (error) return state;
     return Object.assign({}, newState, {

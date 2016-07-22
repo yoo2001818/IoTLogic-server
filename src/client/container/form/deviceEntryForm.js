@@ -2,9 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { reduxForm } from 'redux-form';
 import classNames from 'classnames';
 
-import { confirmDeviceDelete, update as deviceUpdate }
+import { confirmDeviceDelete, update as deviceUpdate, create as deviceCreate }
   from '../../action/device';
-import { replace } from 'react-router-redux';
+import { replace, push } from 'react-router-redux';
 
 import { Device } from '../../../validation/schema';
 import validate from '../../../validation/validate';
@@ -26,11 +26,35 @@ class DeviceEntryForm extends Component {
     this.props.confirmDeviceDelete(this.props.device);
   }
   handleSubmit(values) {
+    if (this.props.creating) {
+      return this.props.deviceCreate(values)
+      .then(action => {
+        if (!action.error) {
+          this.props.push('/devices/' + action.payload.result);
+          return action;
+        }
+        throw {
+          [action.payload.body.field]: {
+            name: action.payload.body.type
+          }
+        };
+      });
+    }
     let changed = values.name !== undefined &&
       this.props.device.name !== values.name;
     return this.props.deviceUpdate(this.props.device.name, values)
-    .then(v => {
-      if (changed) this.props.replace('/devices/' + v.payload.result);
+    .then(action => {
+      if (!action.error) {
+        if (changed) {
+          this.props.replace('/devices/' + action.payload.result);
+        }
+        return action;
+      }
+      throw {
+        [action.payload.body.field]: {
+          name: action.payload.body.type
+        }
+      };
     });
   }
   handleReset(e) {
@@ -157,6 +181,8 @@ DeviceEntryForm.propTypes = {
   confirmDeviceDelete: PropTypes.func,
   deviceUpdate: PropTypes.func,
   replace: PropTypes.func,
+  deviceCreate: PropTypes.func,
+  push: PropTypes.func,
   resetForm: PropTypes.func,
   creating: PropTypes.bool
 };
@@ -170,4 +196,5 @@ export default reduxForm({
 }, (state, props) => ({
   documents: ((props.device && props.device.documents) || []).map(
     v => state.entities.documents[v])
-}), { confirmDeviceDelete, deviceUpdate, replace })(DeviceEntryForm);
+}), { confirmDeviceDelete, deviceUpdate,
+  deviceCreate, replace, push })(DeviceEntryForm);
