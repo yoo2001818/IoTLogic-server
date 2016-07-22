@@ -12,13 +12,18 @@ import routes from './view/routes';
 import createStore from './store';
 import { autoDetectLocale } from './lang';
 import { superagentClient } from './util/apiClient';
+import webSocketConnector from './middleware/webSocketConnector';
+import webSocketHandler from './util/webSocketHandler';
 
 import prefetch from './util/prefetch';
 
 autoDetectLocale();
 
 let store = createStore(undefined, superagentClient(), [
-  routerMiddleware(browserHistory)
+  routerMiddleware(browserHistory),
+  webSocketConnector('ws://' + window.location.host + '/notifications',
+    client => webSocketHandler(client, store)
+  )
 ]);
 const history = syncHistoryWithStore(browserHistory, store);
 

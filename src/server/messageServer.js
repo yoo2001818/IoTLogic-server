@@ -1,7 +1,6 @@
 import { Environment, Router } from 'iotlogic-core';
 import { WebSocketServerConnector } from 'locksmith-connector-ws';
 
-import { Device } from './db';
 import synchronizerConfig from '../../config/synchronizer.config.js';
 
 const debug = require('debug')('IoTLogic:messageServer');
@@ -14,28 +13,7 @@ export default class MessageServer {
     this.deviceStats = {};
     this.dbClients = {};
     this.socketClients = {};
-    this.connector = new WebSocketServerConnector({
-      server,
-      verifyClient: (info, cb) => {
-        let token = info.req.url.slice(1);
-        // TODO server -> client push notification (with websocket)
-        debug('A client connected with token ' + token);
-        Device.findOne({ where: { token } })
-        .then(device => {
-          if (device == null) {
-            debug('Unknown token (Unauthorized)');
-            cb(false, 401, 'Unauthorized');
-            return;
-          }
-          info.req.device = device;
-          cb(true);
-        }, error => {
-          debug('Token loading failed');
-          console.log(error);
-          cb(false, 500, 'Internal server error');
-        });
-      }
-    });
+    this.connector = new WebSocketServerConnector(server, true);
     this.router = new Router(this.connector, true, (provided, clientId) => {
       debug('Connection established with ' + clientId);
       // Ignore data from the client; We've already loaded device info
@@ -151,7 +129,7 @@ export default class MessageServer {
       debug('Synchronizer unfrozen');
     });
 
-    this.connector.start();
+    this.connector.start(null, true);
   }
   getDeviceStats(device) {
     let clientId = this.dbClients[device.id];

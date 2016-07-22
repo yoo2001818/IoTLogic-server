@@ -1,8 +1,10 @@
 import http from 'http';
+import { Server as WebSocketServer } from 'ws';
 import express from 'express';
 import MessageServer from './messageServer';
 
 import apiRouter from './api';
+import webSocketVerify from './util/webSocketVerify';
 import logging from './util/logging';
 import errorCode from './util/errorCode';
 import serveStatic from 'serve-static';
@@ -12,7 +14,18 @@ import networkConfig from '../../config/network.config';
 const production = process.env.NODE_ENV === 'production';
 
 const httpServer = http.createServer();
-const messageServer = new MessageServer(httpServer);
+const webSocketServer = new WebSocketServer({
+  server: httpServer,
+  verifyClient: webSocketVerify
+});
+const messageServer = new MessageServer(webSocketServer);
+
+webSocketServer.on('connection', client => {
+  console.log(client.upgradeReq.url);
+  // TODO Intercept to push server
+  messageServer.connector.handleConnect(client);
+});
+
 const app = express();
 
 app.set('x-powered-by', false);
