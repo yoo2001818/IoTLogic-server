@@ -39,10 +39,11 @@ class DeviceEntryForm extends Component {
   }
   render() {
     const { fields: { name, alias, type, data },
-      handleSubmit, invalid, submitting, device, className, dirty, documents }
+      handleSubmit, invalid, submitting, device, className, dirty, documents,
+      creating }
       = this.props;
     const onSubmit = handleSubmit(this.handleSubmit.bind(this));
-    if (device == null) return false;
+    if (!creating && device == null) return false;
     return (
         <div className={classNames('device-entry-form', className)}>
           <form onSubmit={onSubmit}>
@@ -62,52 +63,60 @@ class DeviceEntryForm extends Component {
                   {__('DeviceType' + capitalize(type.value))}
                 </div>
               </Field>
-              <Field label={__('DeviceConnectedLabel')}>
-                <div className='readonly'>
-                  {device.connected ? __('DeviceConnected') :
-                    __('DeviceDisconnected')}
-                </div>
-              </Field>
-              <Field label={__('CreatedDateLabel')}>
-                <div className='readonly'>
-                  {new Date(device.createdAt).toLocaleString()}
-                </div>
-              </Field>
+              {!creating && (
+                <Field label={__('DeviceConnectedLabel')}>
+                  <div className='readonly'>
+                    {device.connected ? __('DeviceConnected') :
+                      __('DeviceDisconnected')}
+                  </div>
+                </Field>
+              )}
+              {!creating && (
+                <Field label={__('CreatedDateLabel')}>
+                  <div className='readonly'>
+                    {new Date(device.createdAt).toLocaleString()}
+                  </div>
+                </Field>
+              )}
               <div className='section-action'>
-                <Button className='red' div noFocus
-                  onClick={this.handleDelete.bind(this)}
-                >
-                  <span className='trash-icon icon-right' />
-                  {__('DeviceDelete')}
-                </Button>
+                {!creating && (
+                  <Button className='red' div noFocus
+                    onClick={this.handleDelete.bind(this)}
+                  >
+                    <span className='trash-icon icon-right' />
+                    {__('DeviceDelete')}
+                  </Button>
+                )}
                 <Button onClick={onSubmit} disabled={!dirty || invalid ||
                   submitting}
                 >
                   <span className='check-icon icon-right'  />
-                  {__('Save')}
+                  {creating ? __('Create') : __('Save')}
                 </Button>
               </div>
             </Section>
-            {device.errors && device.errors.length > 0 && (
+            {!creating && device.errors && device.errors.length > 0 && (
               <Section title={__('DeviceErrorSection')}>
                 <code><pre className='error-log'>
                   {device.errors.join('\n')}
                 </pre></code>
               </Section>
             )}
-            <Section title={__('DeviceDocumentSection')}>
-              {documents.length === 0 && (
-                <p className='tip'>{__('DeviceDocumentListEmptyTip')}</p>
-              )}
-              <ul className='device-list'>
-                {documents.map(document => (
-                  <li key={document.id}>
-                    <DocumentSpan document={document} />
-                  </li>
-                ))}
-              </ul>
-            </Section>
-            { device.type === 'pc' && (
+            {!creating && (
+              <Section title={__('DeviceDocumentSection')}>
+                {documents.length === 0 && (
+                  <p className='tip'>{__('DeviceDocumentListEmptyTip')}</p>
+                )}
+                <ul className='device-list'>
+                  {documents.map(document => (
+                    <li key={document.id}>
+                      <DocumentSpan document={document} />
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            )}
+            {!creating && device.type === 'pc' && (
               <Section title={__('AsyncIOPackagesLabel')}>
                 <ListInput {...data}
                   value={Array.isArray(data.value) ? data.value : []}
@@ -148,7 +157,8 @@ DeviceEntryForm.propTypes = {
   confirmDeviceDelete: PropTypes.func,
   deviceUpdate: PropTypes.func,
   replace: PropTypes.func,
-  resetForm: PropTypes.func
+  resetForm: PropTypes.func,
+  creating: PropTypes.bool
 };
 
 export default reduxForm({
@@ -158,6 +168,6 @@ export default reduxForm({
     return validate(values, Device, true);
   }
 }, (state, props) => ({
-  documents: (props.device.documents || []).map(
+  documents: ((props.device && props.device.documents) || []).map(
     v => state.entities.documents[v])
 }), { confirmDeviceDelete, deviceUpdate, replace })(DeviceEntryForm);
