@@ -261,6 +261,7 @@ export default class MessageServer {
     if (synchronizer == null) {
       return this.addDocument(document);
     }
+    synchronizer.errors = [];
     // Update payload
     synchronizer.push({
       type: 'reset',

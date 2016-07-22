@@ -85,6 +85,21 @@ class DocumentEntryForm extends Component {
                 ]} />
               </Field>*/}
               {!creating && (
+                <Field label={__('RunningLabel')}>
+                  <div className='readonly'>
+                    {document.state !== 'start' ? (
+                      __('DocumentRunningStopped')
+                    ) : (
+                      document.running ? (
+                        __('DocumentRunningStarted')
+                      ) : (
+                        __('DocumentRunningWait')
+                      )
+                    )}
+                  </div>
+                </Field>
+              )}
+              {!creating && (
                 <Field label={__('CreatedDateLabel')}>
                   <div className='readonly'>
                     {new Date(document.createdAt).toLocaleString()}
@@ -108,6 +123,13 @@ class DocumentEntryForm extends Component {
                 </div>
               )}
             </Section>
+            {!creating && document.errors && document.errors.length > 0 && (
+              <Section title={__('DocumentErrorSection')}>
+                <code><pre className='error-log'>
+                  {document.errors.join('\n')}
+                </pre></code>
+              </Section>
+            )}
             {!creating && (
               <Section title={__('DocumentSourceSection')}>
                 <p className='tip'>{__('DocumentSourceSectionHelp')}</p>

@@ -88,6 +88,13 @@ class DeviceEntryForm extends Component {
                 </Button>
               </div>
             </Section>
+            {device.errors && device.errors.length > 0 && (
+              <Section title={__('DeviceErrorSection')}>
+                <code><pre className='error-log'>
+                  {device.errors.join('\n')}
+                </pre></code>
+              </Section>
+            )}
             <Section title={__('DeviceDocumentSection')}>
               {documents.length === 0 && (
                 <p className='tip'>{__('DeviceDocumentListEmptyTip')}</p>

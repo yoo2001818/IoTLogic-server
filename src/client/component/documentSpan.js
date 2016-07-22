@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 export default class DocumentSpan extends Component {
   render() {
-    const { id, name, state, visibility } = this.props.document;
+    const { id, name, state, running, errors } = this.props.document;
     return (
       <Link className='document-span'
         activeClassName='active'
@@ -13,8 +13,10 @@ export default class DocumentSpan extends Component {
         <span className='name'>{name}</span>
         <span className={classNames('state-marker',
           { start: state === 'start' })} />
-        <span className={classNames('visibility-marker',
-          { public: visibility === 'public' })} />
+        <span className={classNames('pause-marker',
+          { paused: state === 'start' && !running })} />
+        <span className={classNames('error-marker', { error:
+          running && errors && errors.length > 0 })} />
       </Link>
     );
   }
