@@ -10,12 +10,12 @@ const PUSH = 'notification/push';
 
 export default function webSocketHandler(client, store) {
   client.onopen = () => {
-    console.log('open');
+    console.log('Connected to the push notification server.');
   };
   client.onmessage = event => {
     let data = parseJSON(event.data);
     if (data == null) return;
-    console.log(data);
+    console.log('Push notification received');
     if (data.type === 'document') {
       // I'm not sure if this is okay....
       store.dispatch({
@@ -46,7 +46,7 @@ export default function webSocketHandler(client, store) {
   client.onerror = event => {
     console.log('error', event);
   };
-  client.onclose = event => {
-    console.log('closed', event);
+  client.onclose = () => {
+    console.log('Disconnected from the push notification server.');
   };
 }

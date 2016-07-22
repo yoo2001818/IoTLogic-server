@@ -274,10 +274,10 @@ export default class MessageServer {
       }
     });
     if (synchronizer.clientList.length <= 1) {
-      debug('Removing synchronizer ' + name);
+      debug('Removing synchronizer ' + docId);
       // Remove synchronizer
       synchronizer.stop();
-      this.router.removeSynchronizer(name);
+      this.router.removeSynchronizer(docId);
     }
     this.pushServer.updateDocument(document.id);
   }
