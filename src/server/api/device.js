@@ -16,13 +16,11 @@ function stripAssociation(document) {
 }
 
 function injectConnected(req, device) {
-  // This is too long... whatever.
-  let clientId = req.app.locals.messageServer.dbClients[device.id];
   let json = device.toJSON();
-  return Object.assign({}, json, {
-    connected: clientId != null,
-    documents: json.documents && json.documents.map(stripAssociation)
-  });
+  return Object.assign({}, json,
+    req.app.locals.messageServer.getDeviceStats(device), {
+      documents: json.documents && json.documents.map(stripAssociation)
+    });
 }
 
 function ensureDevice(req, res, next) {

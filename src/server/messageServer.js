@@ -6,8 +6,12 @@ import synchronizerConfig from '../../config/synchronizer.config.js';
 
 const debug = require('debug')('IoTLogic:messageServer');
 
+const MAX_DEVICE_ERRORS = 10;
+const MAX_DOCUMENT_ERRORS = 10;
+
 export default class MessageServer {
   constructor(server) {
+    this.deviceStats = {};
     this.dbClients = {};
     this.socketClients = {};
     this.connector = new WebSocketServerConnector({
@@ -38,6 +42,28 @@ export default class MessageServer {
       let device = this.connector.clients[clientId].upgradeReq.device;
       let data = device.toJSON();
 
+      // Duplicate client instance is not allowed; try to disconnect the other
+      // if possible.
+      if (this.dbClients[data.id] != null) {
+        let oldId = this.dbClients[data.id];
+        if (oldId !== clientId) {
+          this.connector.disconnect(oldId);
+          this.router.handleDisconnect(oldId);
+        }
+      }
+
+      // TODO We should push notification to web clients
+      // Also, multiprocess load-balancing would require Redis or something
+      // to share the socket status (This is same for the messaging server!)
+
+      // TODO Refactor this client table?
+      this.deviceStats[clientId] = {
+        errors: [],
+        ready: false
+      };
+      this.dbClients[data.id] = clientId;
+      this.socketClients[clientId] = data.id;
+
       if (provided && provided.initialized === false) {
         // Wait for dependency installation
         this.router.connector.connect({
@@ -46,13 +72,7 @@ export default class MessageServer {
         return;
       }
 
-      // TODO We should push notification to web clients
-      // Also, multiprocess load-balancing would require Redis or something
-      // to share the socket status (This is same for the messaging server!)
-
-      // TODO Refactor this client table?
-      this.dbClients[data.id] = clientId;
-      this.socketClients[clientId] = data.id;
+      this.deviceStats[clientId].ready = true;
 
       // Load required documents
       device.getDocuments()
@@ -66,20 +86,8 @@ export default class MessageServer {
             return;
           }
           // Numbers create some issues
-          let docId = 'doc' + document.id;
-          let synchronizer = this.router.synchronizers[docId];
-          if (synchronizer == null) {
-            debug('Creating environment instance of document ' + document.name);
-            // Create environment
-            let environment = new Environment('__server', this.router,
-              synchronizerConfig, true);
-            this.router.addSynchronizer(docId, environment.synchronizer);
-            environment.setPayload(document.payload);
-            synchronizer = environment.synchronizer;
-            // Start the environment instance
-            synchronizer.start();
-          }
           debug('Connecting device to document ' + document.name);
+          let synchronizer = this.createEnvironment(document);
           synchronizer.handleConnect(data, clientId);
         });
       }, error => {
@@ -88,8 +96,29 @@ export default class MessageServer {
         this.connector.error('DB Error', clientId);
       });
     });
-    this.router.on('error', err => {
+    this.router.on('error', (name, err, clientId, fromClient) => {
       console.log((err && err.stack) || err);
+      if (fromClient) {
+        // If name is null, it's a device error. If not, it's a document error.
+        debug('Handling error from ' + name);
+        if (name == null) {
+          // let dataId = this.socketClients[clientId];
+          let stats = this.deviceStats[clientId];
+          if (stats == null) return;
+          stats.errors = stats.errors.slice(0, MAX_DEVICE_ERRORS);
+          stats.errors.push(err);
+          // TODO Push notification
+        } else {
+          let synchronizer = this.router.synchronizers[name];
+          if (synchronizer == null) return;
+          let client = synchronizer.clients[clientId];
+          client = client && client.meta;
+          synchronizer.errors = synchronizer.errors.slice(0,
+            MAX_DOCUMENT_ERRORS);
+          synchronizer.errors.push((client && client.name) + ': ' + err);
+          // TODO Push notification
+        }
+      }
     });
     this.router.on('connect', () => {
       debug('Connected!');
@@ -99,6 +128,7 @@ export default class MessageServer {
         debug('Disconnected from ' + clientId);
         let deviceId = this.socketClients[clientId];
         // TODO Push notification
+        delete this.deviceStats[clientId];
         delete this.dbClients[deviceId];
         delete this.socketClients[clientId];
       } else {
@@ -123,16 +153,63 @@ export default class MessageServer {
 
     this.connector.start();
   }
+  getDeviceStats(device) {
+    let clientId = this.dbClients[device.id];
+    if (clientId == null) {
+      return {
+        connected: false
+      };
+    }
+    let deviceStats = this.deviceStats[clientId];
+    return Object.assign({}, deviceStats, {
+      connected: true
+    });
+  }
+  getDocumentStats(document) {
+    let docId = 'doc' + document.id;
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) {
+      return {
+        running: false
+      };
+    }
+    return {
+      running: true,
+      errors: synchronizer.errors
+    };
+  }
+  createEnvironment(document) {
+    if (document.state !== 'start') {
+      debug('Ignoring stopped document ' + document.name);
+      return;
+    }
+    let docId = 'doc' + document.id;
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) {
+      debug('Creating environment instance of document ' + document.name);
+      // Create environment
+      let environment = new Environment('__server', this.router,
+        synchronizerConfig, true);
+      this.router.addSynchronizer(docId, environment.synchronizer);
+      environment.setPayload(document.payload);
+      synchronizer = environment.synchronizer;
+      // Synchronizer errors
+      synchronizer.errors = [];
+      // Start the environment instance
+      synchronizer.start();
+    }
+    return synchronizer;
+  }
   updateDevice(device) {
     debug('Handling updated device ' + device.name);
     // let data = device.toJSON();
     // Disconnect and reconnect from connected nodes
     let clientId = this.dbClients[device.id];
     if (clientId == null) return;
+    this.connector.disconnect(clientId);
     for (let key in this.router.synchronizers) {
       let synchronizer = this.router.synchronizers[key];
       if (synchronizer.clients[clientId] != null) {
-        this.connector.disconnect(clientId);
         synchronizer.handleDisconnect(clientId);
         // TODO Meh. it'll reconnect anyway.
         // synchronizer.handleConnect(data, clientId);
@@ -160,19 +237,11 @@ export default class MessageServer {
       debug('All devices are not connected; ignoring');
       return;
     }
-    let docId = 'doc' + document.id;
-    debug('Creating environment instance of document ' + document.name);
-    // Create environment
-    let environment = new Environment('__server', this.router,
-      synchronizerConfig, true);
-    this.router.addSynchronizer(docId, environment.synchronizer);
-    environment.setPayload(document.payload);
-    let synchronizer = environment.synchronizer;
-    // Start the environment instance
-    synchronizer.start();
+    let synchronizer = this.createEnvironment(document);
     document.devices.forEach(device => {
       let clientId = this.dbClients[device.id];
       if (clientId == null) return;
+      if (!this.deviceStats[clientId].ready) return;
       let data = device.toJSON();
       debug('Connecting device to document ' + document.name);
       synchronizer.handleConnect(data, clientId);
@@ -203,6 +272,7 @@ export default class MessageServer {
     document.devices.forEach(device => {
       let clientId = this.dbClients[device.id];
       if (clientId == null) return;
+      if (!this.deviceStats[clientId].ready) return;
       clientIds.push(clientId);
       if (synchronizer.clients[clientId] == null) {
         let data = device.toJSON();

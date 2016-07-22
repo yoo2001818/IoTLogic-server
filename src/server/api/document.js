@@ -55,22 +55,23 @@ function ensureOwnership(req, res, next) {
   });
 }
 
-function stripDevices(data, isJSON = false) {
+function stripDevices(req, data, isJSON = false) {
   let json = isJSON ? data : data.toJSON();
   let devicesJSON = (json.devices || []).slice();
   devicesJSON.sort((a, b) => {
     return a.deviceDocumentLink.position - b.deviceDocumentLink.position;
   });
-  let obj = Object.assign({}, json, {
-    devices: devicesJSON.map(v => ({
-      id: v.id,
-      name: v.name
-    })),
-    user: json.user && {
-      id: json.user.id,
-      username: json.user.username
-    },
-  });
+  let obj = Object.assign({}, json,
+    req.app.locals.messageServer.getDocumentStats(data), {
+      devices: devicesJSON.map(v => ({
+        id: v.id,
+        name: v.name
+      })),
+      user: json.user && {
+        id: json.user.id,
+        username: json.user.username
+      },
+    });
   delete obj.deviceDocumentLink;
   return obj;
 }
@@ -83,6 +84,11 @@ router.get('/documents', loginRequired, (req, res) => {
     attributes: {
       exclude: ['payload', 'payloadTemp', 'createdAt', 'updatedAt', 'userId']
     }
+  })
+  .then(documents => {
+    return documents.map(document => Object.assign({}, document.toJSON(),
+      req.app.locals.messageServer.getDocumentStats(document)
+    ));
   }));
 });
 
@@ -106,7 +112,7 @@ router.post('/documents', loginRequired, resolveDevices, (req, res, next) => {
       }
     }).then(document => {
       req.app.locals.messageServer.addDocument(document);
-      res.json(stripDevices(document));
+      res.json(stripDevices(req, document));
     });
   }).catch(error => handleDBError(error, req, res, next));
 });
@@ -139,7 +145,7 @@ router.param('id', (req, res, next, id) => {
 });
 
 router.get('/documents/:id', (req, res) => {
-  res.json(stripDevices(req.document));
+  res.json(stripDevices(req, req.document));
 });
 
 router.post('/documents/:id', ensureOwnership, resolveDevices,
@@ -159,7 +165,7 @@ router.post('/documents/:id', ensureOwnership, resolveDevices,
     }
   }).then(document => {
     req.app.locals.messageServer.updateDocument(document);
-    res.json(stripDevices(document));
+    res.json(stripDevices(req, document));
   }).catch(error => handleDBError(error, req, res, next));
 });
 
@@ -167,7 +173,7 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
   req.document.destroy()
   .then(() => {
     req.app.locals.messageServer.destroyDocument(req.document);
-    res.json(Object.assign({}, stripDevices(req.document), {
+    res.json(Object.assign({}, stripDevices(req, req.document), {
       deleted: true
     }));
   }).catch(error => handleDBError(error, req, res, next));
