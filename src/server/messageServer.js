@@ -9,10 +9,11 @@ const MAX_DEVICE_ERRORS = 10;
 const MAX_DOCUMENT_ERRORS = 10;
 
 export default class MessageServer {
-  constructor(server) {
+  constructor(server, pushServer) {
     this.deviceStats = {};
     this.dbClients = {};
     this.socketClients = {};
+    this.pushServer = pushServer;
     this.connector = new WebSocketServerConnector(server, true);
     this.router = new Router(this.connector, true, (provided, clientId) => {
       debug('Connection established with ' + clientId);
@@ -29,10 +30,6 @@ export default class MessageServer {
           this.router.handleDisconnect(oldId);
         }
       }
-
-      // TODO We should push notification to web clients
-      // Also, multiprocess load-balancing would require Redis or something
-      // to share the socket status (This is same for the messaging server!)
 
       // TODO Refactor this client table?
       this.deviceStats[clientId] = {
@@ -51,6 +48,8 @@ export default class MessageServer {
       }
 
       this.deviceStats[clientId].ready = true;
+
+      this.pushServer.updateDevice(device.id);
 
       // Load required documents
       device.getDocuments()
@@ -85,7 +84,7 @@ export default class MessageServer {
           if (stats == null) return;
           stats.errors = stats.errors.slice(0, MAX_DEVICE_ERRORS);
           stats.errors.push(err);
-          // TODO Push notification
+          this.pushServer.updateDevice(this.socketClients[clientId]);
         } else {
           let synchronizer = this.router.synchronizers[name];
           if (synchronizer == null) return;
@@ -94,7 +93,7 @@ export default class MessageServer {
           synchronizer.errors = synchronizer.errors.slice(0,
             MAX_DOCUMENT_ERRORS);
           synchronizer.errors.push((client && client.name) + ': ' + err);
-          // TODO Push notification
+          this.pushServer.updateDocument(parseInt(name.slice(3)));
         }
       }
     });
@@ -105,10 +104,10 @@ export default class MessageServer {
       if (name === true) {
         debug('Disconnected from ' + clientId);
         let deviceId = this.socketClients[clientId];
-        // TODO Push notification
         delete this.deviceStats[clientId];
         delete this.dbClients[deviceId];
         delete this.socketClients[clientId];
+        this.pushServer.updateDevice(deviceId);
       } else {
         // Check document's client size, then destroy it if nobody is there
         let synchronizer = this.router.synchronizers[name];
@@ -118,6 +117,7 @@ export default class MessageServer {
           // Remove synchronizer
           synchronizer.stop();
           this.router.removeSynchronizer(name);
+          this.pushServer.updateDocument(parseInt(name.slice(3)));
         }
       }
       debug('Disconnected!');
@@ -175,6 +175,7 @@ export default class MessageServer {
       synchronizer.errors = [];
       // Start the environment instance
       synchronizer.start();
+      this.pushServer.updateDocument(document.id);
     }
     return synchronizer;
   }
@@ -272,6 +273,13 @@ export default class MessageServer {
         synchronizer.handleDisconnect(client.id);
       }
     });
+    if (synchronizer.clientList.length <= 1) {
+      debug('Removing synchronizer ' + name);
+      // Remove synchronizer
+      synchronizer.stop();
+      this.router.removeSynchronizer(name);
+    }
+    this.pushServer.updateDocument(document.id);
   }
   destroyDocument(document) {
     debug('Handling destroyed document ' + document.name);
@@ -292,5 +300,6 @@ export default class MessageServer {
     synchronizer.stop();
     // Good bye
     this.router.removeSynchronizer(docId);
+    this.pushServer.updateDocument(docId);
   }
 }

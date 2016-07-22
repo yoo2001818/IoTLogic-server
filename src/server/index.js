@@ -2,6 +2,7 @@ import http from 'http';
 import { Server as WebSocketServer } from 'ws';
 import express from 'express';
 import MessageServer from './messageServer';
+import PushServer from './pushServer';
 
 import apiRouter from './api';
 import webSocketVerify from './util/webSocketVerify';
@@ -18,11 +19,15 @@ const webSocketServer = new WebSocketServer({
   server: httpServer,
   verifyClient: webSocketVerify
 });
-const messageServer = new MessageServer(webSocketServer);
+const pushServer = new PushServer();
+const messageServer = new MessageServer(webSocketServer, pushServer);
+pushServer.messageServer = messageServer;
 
 webSocketServer.on('connection', client => {
-  console.log(client.upgradeReq.url);
-  // TODO Intercept to push server
+  if (client.upgradeReq.url === '/notifications') {
+    pushServer.handleConnect(client);
+    return;
+  }
   messageServer.connector.handleConnect(client);
 });
 
