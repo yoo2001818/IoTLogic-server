@@ -67,7 +67,7 @@
     "express": "^4.14.0",
     "express-promise": "^0.4.0",
     "express-session": "^1.14.0",
-    "iotlogic-core": "^0.1.10",
+    "iotlogic-core": "^0.1.12",
     "locksmith-connector-ws": "^0.2.5",
     "lodash.merge": "^4.4.0",
     "mkdirp": "^0.5.1",

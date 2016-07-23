@@ -118,7 +118,9 @@ export default class MessageServer {
         // Check document's client size, then destroy it if nobody is there
         let synchronizer = this.router.synchronizers[name];
         if (synchronizer == null) return;
-        if (synchronizer.clientList.length <= 1) {
+        if (synchronizer.clientList.length <= 1 &&
+          Object.keys(synchronizer.pseudoDevices).length === 0
+        ) {
           debug('Removing synchronizer ' + name);
           // Remove synchronizer
           for (let key in synchronizer.pseudoDevices) {
@@ -204,19 +206,25 @@ export default class MessageServer {
       environment.setPayload(document.payload);
       environment.runOnStart = false;
       // Do nothing for stdout.... :/
-      // environment.machine.stdout = () => {};
+      environment.handleReset = () => {
+        environment.machine.stdout = () => {};
+      };
       synchronizer = environment.synchronizer;
       resolver.synchronizer = synchronizer;
       // Synchronizer errors
       synchronizer.errors = [];
       synchronizer.pseudoDevices = {};
+      synchronizer.pseudoDeviceIdRef = {};
       // Start the environment instance
       synchronizer.start();
       // Start pseudodevices
       document.devices.forEach(device => {
         if (pseudoDevices[device.type] != null) {
           let pseudoDevice = pseudoDevices[device.type](device, environment);
-          synchronizer.pseudoDevices[device.id] = pseudoDevice;
+          synchronizer.pseudoDevices[device.name] = {
+            id: device.id, device: pseudoDevice
+          };
+          synchronizer.pseudoDeviceIdRef[device.id] = device.name;
           environment.clientList.push(Object.assign({}, device.toJSON(), {
             pseudo: true,
             id: 'pseudo_' + device.id
@@ -232,6 +240,33 @@ export default class MessageServer {
     debug('Handling updated device ' + device.name);
     // let data = device.toJSON();
     // Disconnect and reconnect from connected nodes
+    if (pseudoDevices[device.type] != null) {
+      for (let key in this.router.synchronizers) {
+        let synchronizer = this.router.synchronizers[key];
+        if (synchronizer.pseudoDeviceIdRef[device.id] != null) {
+          let oldName = synchronizer.pseudoDeviceIdRef[device.id];
+          let pseudoDevice = synchronizer.pseudoDevices[oldName];
+
+          delete synchronizer.pseudoDevices[oldName];
+          synchronizer.pseudoDevices[device.name] = pseudoDevice;
+          synchronizer.pseudoDeviceIdRef[device.id] = device.name;
+
+          // Disconnect and reconnect the node
+          synchronizer.push({
+            type: 'disconnect',
+            data: 'pseudo_' + pseudoDevice.id
+          });
+          synchronizer.push({
+            type: 'connect',
+            data: Object.assign({}, device.toJSON(), {
+              pseudo: true,
+              id: 'pseudo_' + device.id
+            })
+          });
+        }
+      }
+      return;
+    }
     let clientId = this.dbClients[device.id];
     if (clientId == null) return;
     this.connector.disconnect(clientId);
@@ -246,6 +281,38 @@ export default class MessageServer {
   }
   destroyDevice(device) {
     debug('Handling destroyed device ' + device.name);
+    if (pseudoDevices[device.type] != null) {
+      for (let key in this.router.synchronizers) {
+        let synchronizer = this.router.synchronizers[key];
+        if (synchronizer.pseudoDeviceIdRef[device.id] != null) {
+          let oldName = synchronizer.pseudoDeviceIdRef[device.id];
+          let pseudoDevice = synchronizer.pseudoDevices[oldName];
+
+          delete synchronizer.pseudoDevices[oldName];
+
+          // Disconnect the node
+          synchronizer.push({
+            type: 'disconnect',
+            data: 'pseudo_' + pseudoDevice.id
+          });
+
+          // Remove device if required
+          if (synchronizer.clientList.length <= 1 &&
+            Object.keys(synchronizer.pseudoDevices).length === 0
+          ) {
+            debug('Removing synchronizer ' + name);
+            // Remove synchronizer
+            for (let key in synchronizer.pseudoDevices) {
+              synchronizer.pseudoDevices[key].disconnect();
+            }
+            synchronizer.stop();
+            this.router.removeSynchronizer(name);
+            this.pushServer.updateDocument(parseInt(name.slice(3)));
+          }
+        }
+      }
+      return;
+    }
     let clientId = this.dbClients[device.id];
     if (clientId == null) return;
     // Disconnect from main
@@ -304,12 +371,15 @@ export default class MessageServer {
     // Handle joining
     document.devices.forEach(device => {
       if (pseudoDevices[device.type] != null) {
-        deviceIds.push(device.id);
-        if (synchronizer.pseudoDevices[device.id] != null) return;
+        deviceIds.push(device.name);
+        if (synchronizer.pseudoDevices[device.name] != null) return;
         debug('Connecting pseudo device to document ' + document.name);
         // Create pseudodevice
         let pseudoDevice = pseudoDevices[device.type](device, environment);
-        synchronizer.pseudoDevices[device.id] = pseudoDevice;
+        synchronizer.pseudoDeviceIdRef[device.id] = device.name;
+        synchronizer.pseudoDevices[device.name] = {
+          id: device.id, device: pseudoDevice
+        };
         // Emit the connection event
         synchronizer.push({
           type: 'connect',
@@ -332,16 +402,17 @@ export default class MessageServer {
     });
     // Handle disconnecting
     for (let key in synchronizer.pseudoDevices) {
-      let id = parseInt(key);
-      if (isNaN(id)) return;
-      if (deviceIds.indexOf(id) === -1) {
-        debug('Disconnecting pseudo device ' + id);
-        synchronizer.pseudoDevices[key].disconnect();
+      if (deviceIds.indexOf(key) === -1) {
+        debug('Disconnecting pseudo device ' + key);
+        let pseudoDevice = synchronizer.pseudoDevices[key];
+        pseudoDevice.device.disconnect();
         // Emit the disconnect event
         synchronizer.push({
           type: 'disconnect',
-          data: 'pseudo_' + id
+          data: 'pseudo_' + pseudoDevice.id
         });
+        delete synchronizer.pseudoDevices[key];
+        delete synchronizer.pseudoDeviceIdRef[pseudoDevice.id];
       }
     }
     synchronizer.clientList.forEach(client => {

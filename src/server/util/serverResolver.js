@@ -38,12 +38,18 @@ export default class ServerResolver extends DefaultResolver {
     } else {
       throw new Error('Event name must be a string, symbol, or pair');
     }
-    // This requires synchronization between multiple devices - some device can
-    // issue an error, but some may not. TODO
-    if (deviceName !== this.name) {
-      // Create no-op
-      return NOOP;
+    if (this.synchronizer.pseudoDevices[deviceName] != null) {
+      let pseudoDevice = this.synchronizer.pseudoDevices[deviceName].device;
+      // TODO Is this the right place for this?
+      if (commandName === 'functions') {
+        return (params, callback) => {
+          let arr = Object.keys(pseudoDevice.directives);
+          setTimeout(() => callback([arr], true), 0);
+        };
+      }
+      // Pass the pseudo-device's directive.
+      return pseudoDevice.directives[commandName];
     }
-    return this.directives[commandName];
+    return NOOP;
   }
 }
