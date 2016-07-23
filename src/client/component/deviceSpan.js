@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 export default class DeviceSpan extends Component {
   render() {
     const { children } = this.props;
-    const { name, alias, connected, errors } = this.props.device;
+    const { name, alias, connected, errors, pseudo } = this.props.device;
     return (
       <Link className='device-span'
         activeClassName='active'
@@ -13,9 +13,13 @@ export default class DeviceSpan extends Component {
       >
         <span className='alias'>{alias || name}</span>
         {alias && <span className='name'>{name}</span>}
-        <span className={classNames('connection-marker', { connected })} />
-        <span className={classNames('error-marker', { error:
-          connected && errors && errors.length > 0 })} />
+        {!pseudo && (
+          <span className={classNames('connection-marker', { connected })} />
+        )}
+        {!pseudo && (
+          <span className={classNames('error-marker', { error:
+            connected && errors && errors.length > 0 })} />
+        )}
         { children }
       </Link>
     );

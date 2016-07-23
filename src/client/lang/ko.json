@@ -39,6 +39,7 @@
   "DeviceConnectedLabel": "연결 여부",
   "DeviceConnected": "연결됨",
   "DeviceDisconnected": "연결 안 됨",
+  "DevicePseudo": "서버에서 실행 중",
   "DeviceTypePc": "PC (Node.js)",
   "DeviceTypeAndroid": "Android",
   "DeviceDelete": "삭제",

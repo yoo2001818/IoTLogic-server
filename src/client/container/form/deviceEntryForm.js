@@ -90,8 +90,9 @@ class DeviceEntryForm extends Component {
               {!creating && (
                 <Field label={__('DeviceConnectedLabel')}>
                   <div className='readonly'>
-                    {device.connected ? __('DeviceConnected') :
-                      __('DeviceDisconnected')}
+                    {device.pseudo ? __('DevicePseudo') : (
+                      device.connected ? __('DeviceConnected') :
+                        __('DeviceDisconnected'))}
                   </div>
                 </Field>
               )}

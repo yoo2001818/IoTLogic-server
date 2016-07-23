@@ -20,6 +20,7 @@ function injectConnected(req, device) {
   let json = device.toJSON();
   if (pseudoDevices[json.type] != null) {
     return Object.assign({}, json, {
+      pseudo: true,
       documents: json.documents && json.documents.map(stripAssociation)
     });
   }
