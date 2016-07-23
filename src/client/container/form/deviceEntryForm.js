@@ -196,6 +196,6 @@ export default reduxForm({
   }
 }, (state, props) => ({
   documents: ((props.device && props.device.documents) || []).map(
-    v => state.entities.documents[v])
+    v => state.entities.documents[v]).filter(v => v != null)
 }), { confirmDeviceDelete, deviceUpdate,
   deviceCreate, replace, push })(DeviceEntryForm);

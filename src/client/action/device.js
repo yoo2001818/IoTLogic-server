@@ -68,11 +68,9 @@ export const update = createAction(UPDATE,
 
 export function load(name) {
   return (dispatch, getState) => {
-    const { entities: { devices }, user: { username } } = getState();
+    const { entities: { devices } } = getState();
     const entry = devices[name];
-    if (entry != null && entry.documents !== undefined
-      && entry.user === username
-    ) {
+    if (entry != null && entry.documents !== undefined) {
       return Promise.resolve();
     }
     return dispatch(fetch(name));

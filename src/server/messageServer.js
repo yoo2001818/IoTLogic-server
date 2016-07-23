@@ -81,26 +81,28 @@ export default class MessageServer {
     });
     this.router.on('error', (name, err, clientId, fromClient) => {
       console.log((err && err.stack) || err);
-      if (fromClient) {
-        // If name is null, it's a device error. If not, it's a document error.
-        debug('Handling error from ' + name);
-        if (name == null) {
-          // let dataId = this.socketClients[clientId];
-          let stats = this.deviceStats[clientId];
-          if (stats == null) return;
-          stats.errors = stats.errors.slice(0, MAX_DEVICE_ERRORS);
-          stats.errors.push(err);
-          this.pushServer.updateDevice(this.socketClients[clientId]);
-        } else {
-          let synchronizer = this.router.synchronizers[name];
-          if (synchronizer == null) return;
+      // If name is null, it's a device error. If not, it's a document error.
+      debug('Handling error from ' + name);
+      if (fromClient && name == null) {
+        // let dataId = this.socketClients[clientId];
+        let stats = this.deviceStats[clientId];
+        if (stats == null) return;
+        stats.errors = stats.errors.slice(0, MAX_DEVICE_ERRORS);
+        stats.errors.push(err);
+        this.pushServer.updateDevice(this.socketClients[clientId]);
+      } else if (name != null) {
+        let synchronizer = this.router.synchronizers[name];
+        if (synchronizer == null) return;
+        let header = '';
+        if (clientId != null && clientId !== 0) {
           let client = synchronizer.clients[clientId];
           client = client && client.meta;
-          synchronizer.errors = synchronizer.errors.slice(0,
-            MAX_DOCUMENT_ERRORS);
-          synchronizer.errors.push((client && client.name) + ': ' + err);
-          this.pushServer.updateDocument(parseInt(name.slice(3)));
+          header = (client && client.name) + ': ';
         }
+        synchronizer.errors = synchronizer.errors.slice(0,
+          MAX_DOCUMENT_ERRORS);
+        synchronizer.errors.push(header + err);
+        this.pushServer.updateDocument(parseInt(name.slice(3)));
       }
     });
     this.router.on('connect', () => {
@@ -184,12 +186,12 @@ export default class MessageServer {
     .then(devices => {
       devices.forEach(device => {
         device.documents.forEach(document => {
-          this.createEnvironment(document);
+          this.createEnvironment(document, true);
         });
       });
     });
   }
-  createEnvironment(document) {
+  createEnvironment(document, pseudoOnly = false) {
     if (document.state !== 'start') {
       debug('Ignoring stopped document ' + document.name);
       return;
@@ -218,6 +220,7 @@ export default class MessageServer {
       // Start the environment instance
       synchronizer.start();
       // Start pseudodevices
+      let hasPseudo = false;
       document.devices.forEach(device => {
         if (pseudoDevices[device.type] != null) {
           let pseudoDevice = pseudoDevices[device.type](device, environment);
@@ -229,9 +232,15 @@ export default class MessageServer {
             pseudo: true,
             id: 'pseudo_' + device.id
           }));
+          hasPseudo = true;
         }
       });
-      environment.runPayload();
+      if (hasPseudo && pseudoOnly) {
+        synchronizer.push({
+          type: 'reset',
+          data: document.payload
+        });
+      }
       this.pushServer.updateDocument(document.id);
     }
     return synchronizer;
@@ -300,14 +309,11 @@ export default class MessageServer {
           if (synchronizer.clientList.length <= 1 &&
             Object.keys(synchronizer.pseudoDevices).length === 0
           ) {
-            debug('Removing synchronizer ' + name);
+            debug('Removing synchronizer ' + key);
             // Remove synchronizer
-            for (let key in synchronizer.pseudoDevices) {
-              synchronizer.pseudoDevices[key].disconnect();
-            }
             synchronizer.stop();
-            this.router.removeSynchronizer(name);
-            this.pushServer.updateDocument(parseInt(name.slice(3)));
+            this.router.removeSynchronizer(key);
+            this.pushServer.updateDocument(parseInt(key.slice(3)));
           }
         }
       }
@@ -334,7 +340,8 @@ export default class MessageServer {
       debug('All devices are not connected; ignoring');
       return;
     }
-    let synchronizer = this.createEnvironment(document);
+    let synchronizer = this.createEnvironment(document,
+      !document.devices.some(device => this.dbClients[device.id] != null));
     document.devices.forEach(device => {
       let clientId = this.dbClients[device.id];
       if (clientId == null) return;

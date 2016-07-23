@@ -6,28 +6,36 @@ import DeviceSpan from '../component/deviceSpan';
 import __ from '../lang';
 
 class DeviceList extends Component {
+  filterRemoved() {
+    return this.props.value.filter((_, i) => this.props.list[i] != null);
+  }
   handleRemove(index) {
-    this.props.onChange(this.props.value.filter((_, i) => i !== index));
+    this.props.onChange(this.filterRemoved(this.props.value)
+      .filter((_, i) => i !== index));
   }
   handleAdd(value) {
-    this.props.onChange(this.props.value.concat(value));
+    this.props.onChange(this.filterRemoved(this.props.value)
+      .concat(value));
   }
   render() {
     return (
       <div className='device-list-root'>
         <ul className='device-list'>
           {
-            this.props.list.length > 0 ? (
-              this.props.list.map((device, index) => (
-                <li key={device.id}>
-                  <DeviceSpan device={device} />
-                  <div className='remove-btn' tabIndex={0}
-                    onClick={this.handleRemove.bind(this, index)}
-                  >
-                    <span className='minus-icon' />
-                  </div>
-                </li>
-            ))) : (
+            this.props.list.some(v => v != null) ? (
+              this.props.list.map((device, index) => {
+                if (device == null) return false;
+                return (
+                  <li key={device.id}>
+                    <DeviceSpan device={device} />
+                    <div className='remove-btn' tabIndex={0}
+                      onClick={this.handleRemove.bind(this, index)}
+                    >
+                      <span className='minus-icon' />
+                    </div>
+                  </li>
+                );
+              })) : (
               <p className='tip'>{__('DocumentDeviceListEmptyTip')}</p>
             )
           }

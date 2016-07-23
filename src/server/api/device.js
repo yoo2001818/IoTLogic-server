@@ -59,7 +59,8 @@ router.post('/devices/', loginRequired, (req, res, next) => {
   }))
   .then(device => {
     if (pseudoDevices[device.type] != null) {
-      res.json(Object.assign({}, device.toJSON(), { documents: [] }));
+      res.json(Object.assign({}, device.toJSON(), { documents: [],
+        pseudo: true }));
       return;
     }
     let token = device.token;
