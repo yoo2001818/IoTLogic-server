@@ -34,5 +34,9 @@ export default {
   forbidden: {
     id: 'FORBIDDEN',
     message: 'You don\'t have permssion to access specified content.'
+  },
+  pseudoDeviceToken: {
+    id: 'PSEUDO_DEVICE_TOKEN',
+    message: 'Attempted to access the token value of a pseudo-device.'
   }
 };

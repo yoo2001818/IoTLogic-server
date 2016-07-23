@@ -1,4 +1,5 @@
 import { Device, User } from '../db';
+import pseudoDevices from '../device';
 import session from '../middleware/session';
 const debug = require('debug')('IoTLogic:webSocketVerify');
 
@@ -33,6 +34,11 @@ export default function verifyClient(info, cb) {
     if (device == null) {
       debug('Unknown token (Unauthorized)');
       cb(false, 401, 'Unauthorized');
+      return;
+    }
+    if (pseudoDevices[device.type] != null) {
+      debug('Attempted to connect as pseudo-device (Forbidden)');
+      cb(false, 403, 'Forbidden');
       return;
     }
     info.req.device = device;

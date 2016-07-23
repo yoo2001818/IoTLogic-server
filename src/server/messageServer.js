@@ -1,7 +1,11 @@
 import { Environment, Router } from 'iotlogic-core';
 import { WebSocketServerConnector } from 'locksmith-connector-ws';
 
+import { Device, Document } from './db';
+
 import synchronizerConfig from '../../config/synchronizer.config.js';
+import ServerResolver from './util/serverResolver';
+import pseudoDevices from './device';
 
 const debug = require('debug')('IoTLogic:messageServer');
 
@@ -52,7 +56,9 @@ export default class MessageServer {
       this.pushServer.updateDevice(device.id);
 
       // Load required documents
-      device.getDocuments()
+      device.getDocuments({
+        include: [ Device ]
+      })
       .then(documents => {
         debug('Loaded device documents');
         // Create document
@@ -115,6 +121,9 @@ export default class MessageServer {
         if (synchronizer.clientList.length <= 1) {
           debug('Removing synchronizer ' + name);
           // Remove synchronizer
+          for (let key in synchronizer.pseudoDevices) {
+            synchronizer.pseudoDevices[key].disconnect();
+          }
           synchronizer.stop();
           this.router.removeSynchronizer(name);
           this.pushServer.updateDocument(parseInt(name.slice(3)));
@@ -130,6 +139,7 @@ export default class MessageServer {
     });
 
     this.connector.start(null, true);
+    this.initPseudoDevices();
   }
   getDeviceStats(device) {
     let clientId = this.dbClients[device.id];
@@ -156,6 +166,27 @@ export default class MessageServer {
       errors: synchronizer.errors
     };
   }
+  initPseudoDevices() {
+    // Start documents with pseudo device attached
+    Device.findAll({
+      where: {
+        type: {
+          $in: Object.keys(pseudoDevices)
+        }
+      },
+      include: [{
+        model: Document,
+        include: [ Device ]
+      }]
+    })
+    .then(devices => {
+      devices.forEach(device => {
+        device.documents.forEach(document => {
+          this.createEnvironment(document);
+        });
+      });
+    });
+  }
   createEnvironment(document) {
     if (document.state !== 'start') {
       debug('Ignoring stopped document ' + document.name);
@@ -166,15 +197,33 @@ export default class MessageServer {
     if (synchronizer == null) {
       debug('Creating environment instance of document ' + document.name);
       // Create environment
+      let resolver = new ServerResolver();
       let environment = new Environment('__server', this.router,
-        synchronizerConfig, true);
+        synchronizerConfig, false, undefined, resolver);
       this.router.addSynchronizer(docId, environment.synchronizer);
       environment.setPayload(document.payload);
+      environment.runOnStart = false;
+      // Do nothing for stdout.... :/
+      // environment.machine.stdout = () => {};
       synchronizer = environment.synchronizer;
+      resolver.synchronizer = synchronizer;
       // Synchronizer errors
       synchronizer.errors = [];
+      synchronizer.pseudoDevices = {};
       // Start the environment instance
       synchronizer.start();
+      // Start pseudodevices
+      document.devices.forEach(device => {
+        if (pseudoDevices[device.type] != null) {
+          let pseudoDevice = pseudoDevices[device.type](device, environment);
+          synchronizer.pseudoDevices[device.id] = pseudoDevice;
+          environment.clientList.push(Object.assign({}, device.toJSON(), {
+            pseudo: true,
+            id: 'pseudo_' + device.id
+          }));
+        }
+      });
+      environment.runPayload();
       this.pushServer.updateDocument(document.id);
     }
     return synchronizer;
@@ -212,7 +261,9 @@ export default class MessageServer {
       debug('Ignoring stopped document ' + document.name);
       return;
     }
-    if (!document.devices.some(device => this.dbClients[device.id] != null)) {
+    if (!document.devices.some(device =>
+      this.dbClients[device.id] != null || pseudoDevices[device.type] != null)
+    ) {
       debug('All devices are not connected; ignoring');
       return;
     }
@@ -246,10 +297,29 @@ export default class MessageServer {
       type: 'reset',
       data: document.payload
     });
+    let environment = synchronizer.machine;
     // Update devices
     let clientIds = [];
+    let deviceIds = [];
     // Handle joining
     document.devices.forEach(device => {
+      if (pseudoDevices[device.type] != null) {
+        deviceIds.push(device.id);
+        if (synchronizer.pseudoDevices[device.id] != null) return;
+        debug('Connecting pseudo device to document ' + document.name);
+        // Create pseudodevice
+        let pseudoDevice = pseudoDevices[device.type](device, environment);
+        synchronizer.pseudoDevices[device.id] = pseudoDevice;
+        // Emit the connection event
+        synchronizer.push({
+          type: 'connect',
+          data: Object.assign({}, device.toJSON(), {
+            pseudo: true,
+            id: 'pseudo_' + device.id
+          })
+        });
+        return;
+      }
       let clientId = this.dbClients[device.id];
       if (clientId == null) return;
       if (!this.deviceStats[clientId].ready) return;
@@ -261,6 +331,19 @@ export default class MessageServer {
       }
     });
     // Handle disconnecting
+    for (let key in synchronizer.pseudoDevices) {
+      let id = parseInt(key);
+      if (isNaN(id)) return;
+      if (deviceIds.indexOf(id) === -1) {
+        debug('Disconnecting pseudo device ' + id);
+        synchronizer.pseudoDevices[key].disconnect();
+        // Emit the disconnect event
+        synchronizer.push({
+          type: 'disconnect',
+          data: 'pseudo_' + id
+        });
+      }
+    }
     synchronizer.clientList.forEach(client => {
       if (client.id !== this.connector.getClientId() &&
         clientIds.indexOf(client.id) === -1
@@ -273,7 +356,9 @@ export default class MessageServer {
         synchronizer.handleDisconnect(client.id);
       }
     });
-    if (synchronizer.clientList.length <= 1) {
+    if (synchronizer.clientList.length <= 1 &&
+      Object.keys(synchronizer.pseudoDevices).length === 0
+    ) {
       debug('Removing synchronizer ' + docId);
       // Remove synchronizer
       synchronizer.stop();
@@ -296,6 +381,9 @@ export default class MessageServer {
         synchronizer.handleDisconnect(client.id);
       }
     });
+    for (let key in synchronizer.pseudoDevices) {
+      synchronizer.pseudoDevices[key].disconnect();
+    }
     // Remove synchronizer
     synchronizer.stop();
     // Good bye

@@ -4,6 +4,7 @@ import loginRequired from './lib/loginRequired';
 import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
 import pick from '../util/pick';
+import pseudoDevices from '../device';
 import { Device, Document } from '../db';
 
 const router = new Express.Router();
@@ -17,6 +18,11 @@ function stripAssociation(document) {
 
 function injectConnected(req, device) {
   let json = device.toJSON();
+  if (pseudoDevices[json.type] != null) {
+    return Object.assign({}, json, {
+      documents: json.documents && json.documents.map(stripAssociation)
+    });
+  }
   return Object.assign({}, json,
     req.app.locals.messageServer.getDeviceStats(device), {
       documents: json.documents && json.documents.map(stripAssociation)
@@ -51,8 +57,13 @@ router.post('/devices/', loginRequired, (req, res, next) => {
     token: randomstring.generate()
   }))
   .then(device => {
+    if (pseudoDevices[device.type] != null) {
+      res.json(Object.assign({}, device.toJSON(), { documents: [] }));
+      return;
+    }
     let token = device.token;
-    res.json(Object.assign({}, device.toJSON(), { token, connected: false }));
+    res.json(Object.assign({}, device.toJSON(), {
+      token, connected: false, documents: [] }));
   }, error => handleDBError(error, req, res, next));
 });
 
@@ -84,7 +95,7 @@ router.get('/devices/:name', ensureDevice, (req, res) => {
 });
 
 router.post('/devices/:name', ensureDevice, (req, res, next) => {
-  let data = pick(req.body, ['name', 'alias', 'type', 'data'], true);
+  let data = pick(req.body, ['name', 'alias', 'data'], true);
   if (data.data !== undefined) data.data = JSON.stringify(data.data);
   req.device.update(data)
   .then(device => {
@@ -94,6 +105,11 @@ router.post('/devices/:name', ensureDevice, (req, res, next) => {
 });
 
 router.post('/devices/:name/token', ensureDevice, (req, res, next) => {
+  if (pseudoDevices[req.device.type] != null) {
+    res.status(403);
+    res.json(errorCode.pseudoDeviceToken);
+    return;
+  }
   req.device.update({
     token: randomstring.generate()
   })
