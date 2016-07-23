@@ -1,3 +1,5 @@
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
 export default function webSocketConnector(address, addHandler) {
   let webSocketClient = null;
   return store => next => action => {
@@ -7,7 +9,7 @@ export default function webSocketConnector(address, addHandler) {
     if (currentState.user.username != null && (!prevState.user ||
       prevState.user.username == null) && webSocketClient == null
     ) {
-      webSocketClient = new WebSocket(address);
+      webSocketClient = new ReconnectingWebSocket(address);
       addHandler(webSocketClient);
     }
     if (currentState.user.username == null && prevState.user &&
