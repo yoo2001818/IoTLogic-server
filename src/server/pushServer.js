@@ -28,15 +28,17 @@ export default class PushServer {
     }
     this.userClients[userId].push(client);
 
-    client.onmessage = () => {
+    client.onmessage = event => {
       let data = parseJSON(event.data);
       if (data == null) return;
       switch (data.type) {
       case 'registerConsole': {
+        if (client.consoles == null) client.consoles = {};
         client.consoles[data.data] = true;
         return;
       }
       case 'unregisterConsole': {
+        if (client.consoles == null) client.consoles = {};
         client.consoles[data.data] = false;
         return;
       }
@@ -126,7 +128,7 @@ export default class PushServer {
     }
     this.consoleTimers[documentId] = setTimeout(() => {
       let msg = this.consoleMsg[documentId];
-      this.sendDocument(documentId, 'documentConsole', { console: msg },
+      this.sendDocument(documentId, 'documentConsole', { message: msg },
         client => {
           return client.consoles[documentId] === true;
         });

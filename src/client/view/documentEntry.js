@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
 import { load } from '../action/document';
+import { register, unregister } from '../action/console';
 
 import DropDown from '../component/ui/dropDown';
 import AppContainer from '../container/appContainer';
@@ -25,6 +26,20 @@ MenuEntry.propTypes = {
 };
 
 class DocumentEntry extends Component {
+  componentDidMount() {
+    this.docId = this.props.params.id;
+    this.props.register(parseInt(this.props.params.id));
+  }
+  componentDidUpdate() {
+    if (this.docId !== this.props.params.id) {
+      this.props.unregister(parseInt(this.docId));
+      this.docId = this.props.params.id;
+      this.props.register(parseInt(this.props.params.id));
+    }
+  }
+  componentWillUnmount() {
+    this.props.unregister(parseInt(this.props.params.id));
+  }
   render() {
     const { document, children } = this.props;
     if (document && document.devices !== undefined) {
@@ -57,13 +72,17 @@ class DocumentEntry extends Component {
 
 DocumentEntry.propTypes = {
   document: PropTypes.object,
-  children: PropTypes.node
+  children: PropTypes.node,
+  register: PropTypes.func,
+  unregister: PropTypes.func,
+  params: PropTypes.object
 };
 
 const ConnectDocumentEntry = connect(
   (store, props) => ({
     document: store.entities.documents[props.params.id]
-  })
+  }),
+  { register, unregister }
 )(DocumentEntry);
 
 ConnectDocumentEntry.fetchData = function(store, routerState) {

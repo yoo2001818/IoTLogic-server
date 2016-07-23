@@ -102,7 +102,8 @@ export default class MessageServer {
         synchronizer.errors = synchronizer.errors.slice(0,
           MAX_DOCUMENT_ERRORS);
         synchronizer.errors.push(header + err);
-        this.pushServer.updateDocument(parseInt(name.slice(3)));
+        this.pushServer.pushDocumentError(parseInt(name.slice(3)),
+          header + err);
       }
     });
     this.router.on('connect', () => {
@@ -196,6 +197,7 @@ export default class MessageServer {
       debug('Ignoring stopped document ' + document.name);
       return;
     }
+    let docIntId = document.id;
     let docId = 'doc' + document.id;
     let synchronizer = this.router.synchronizers[docId];
     if (synchronizer == null) {
@@ -209,7 +211,9 @@ export default class MessageServer {
       environment.runOnStart = false;
       // Do nothing for stdout.... :/
       environment.handleReset = () => {
-        environment.machine.stdout = () => {};
+        environment.machine.stdout = msg => {
+          this.pushServer.pushDocumentConsole(docIntId, msg);
+        };
       };
       synchronizer = environment.synchronizer;
       resolver.synchronizer = synchronizer;
@@ -467,5 +471,25 @@ export default class MessageServer {
     // Good bye
     this.router.removeSynchronizer(docId);
     this.pushServer.updateDocument(docId);
+  }
+  restartDocument(document) {
+    debug('Restarting document ' + document.name);
+    if (document.devices == null) {
+      throw new Error('Devices value must be present (Eager loading)');
+    }
+    if (document.state !== 'start') {
+      return;
+    }
+    let docId = 'doc' + document.id;
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) {
+      return;
+    }
+    synchronizer.errors = [];
+    // TODO Remove payload if possible (core doesn't suppot empty data yet)
+    synchronizer.push({
+      type: 'reset',
+      data: document.payload
+    });
   }
 }

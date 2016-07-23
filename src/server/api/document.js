@@ -179,6 +179,11 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
   }).catch(error => handleDBError(error, req, res, next));
 });
 
+router.post('/documents/:id/restart', ensureOwnership, (req, res) => {
+  req.app.locals.messageServer.restartDocument(req.document);
+  res.json(stripDevices(req, req.document));
+});
+
 router.get('/documents/:id/payload', (req, res) => {
   res.type('text/plain');
   res.attachment(req.document.name + '.scm');
