@@ -17,8 +17,9 @@ export const FETCH_WORKSPACE = 'document/fetchWorkspace';
 export const UPDATE_WORKSPACE = 'document/updateWorkspace';
 export const DELETE_WORKSPACE = 'document/deleteWorkspace';
 
-// WIP
+export const RESTART = 'document/restart';
 export const EVALUATE = 'document/evaluate';
+export const CLEAR_LOG = 'document/clearLog';
 
 export const fetchList = createAction(FETCH_LIST,
   () => api(GET, '/documents/', {}),
@@ -104,6 +105,23 @@ export const deleteWorkspace = createAction(DELETE_WORKSPACE,
   }),
   document => ({
     relation: ['documents', document.id, 'workspace']
+  }));
+export const restart = createAction(RESTART,
+  document => api(POST, `/documents/${document.id}/restart`, {}));
+export const evaluate = createAction(EVALUATE,
+  (document, code) => api(POST, `/documents/${document.id}/eval`, {
+    body: { payload: code }
+  }));
+export const clearLog = createAction(CLEAR_LOG,
+  () => ({}),
+  document => ({
+    append: {
+      documents: {
+        [document.id]: {
+          console: ''
+        }
+      }
+    }
   }));
 export function load(name) {
   return (dispatch, getState) => {

@@ -181,7 +181,13 @@ router.delete('/documents/:id', ensureOwnership, (req, res, next) => {
 
 router.post('/documents/:id/restart', ensureOwnership, (req, res) => {
   req.app.locals.messageServer.restartDocument(req.document);
-  res.json(stripDevices(req, req.document));
+  res.json({});
+});
+
+router.post('/documents/:id/eval', ensureOwnership, (req, res) => {
+  req.app.locals.messageServer.evalDocument(req.document,
+    req.body.payload || '');
+  res.json({});
 });
 
 router.get('/documents/:id/payload', (req, res) => {

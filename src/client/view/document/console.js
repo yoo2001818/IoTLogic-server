@@ -1,11 +1,84 @@
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
+import { restart, clearLog, evaluate } from '../../action/document';
 
-export default class DocumentEntryConsole extends Component {
+import Button from '../../component/ui/button';
+import __ from '../../lang';
+
+class DocumentEntryConsole extends Component {
+  handleReset() {
+    this.props.restart(this.props.document);
+  }
+  handleClear() {
+    this.props.clearLog(this.props.document);
+  }
+
+  handleKeyDown(e) {
+    if (e.keyCode === 13) {
+      if (e.shiftKey) return;
+      if (this.inputNode.value.trim() === '') return;
+      this.props.evaluate(this.props.document, this.inputNode.value);
+      this.inputNode.value = '';
+      this.handleKeyUp();
+      e.preventDefault();
+    }
+  }
+  handleKeyUp() {
+    this.inputNode.style.height = '5px';
+    this.inputNode.style.height = (this.inputNode.scrollHeight) + 'px';
+    if (this.inputNode.scrollHeight > 150) {
+      this.inputNode.style.overflow = 'auto';
+    } else {
+      this.inputNode.style.overflow = 'hidden';
+    }
+  }
+
+  componentDidMount() {
+    this.consoleNode.scrollTop = this.consoleNode.scrollHeight;
+    this.handleKeyUp();
+  }
+  componentWillUpdate() {
+    let node = this.consoleNode;
+    this.shouldScrollBottom =
+      Math.abs(node.scrollTop + node.offsetHeight - node.scrollHeight) < 50;
+  }
+  componentDidUpdate() {
+    if (this.shouldScrollBottom) {
+      this.consoleNode.scrollTop = this.consoleNode.scrollHeight;
+    }
+  }
+
   render() {
     return (
-      <div className='document-entry-view general-view'>
-        <div className='content'>
-          Console
+      <div className='console-view'>
+        <div className='menu'>
+          <Button className='orange'
+            onClick={this.handleReset.bind(this)}
+          >
+            <span className='undo-icon icon-right' />{__('Restart')}
+          </Button>
+          <Button
+            onClick={this.handleClear.bind(this)}
+          >
+            <span className='times-icon icon-right' />{__('ClearLog')}
+          </Button>
+        </div>
+        <div className='console'
+          ref={node => this.consoleNode = node}
+        >
+          <pre>
+            { (this.props.document.console) || '' }
+          </pre>
+        </div>
+        <div className='input'>
+          <textarea className='code-input'
+            defaultValue=''
+            placeholder={__('ConsoleInputPlaceholder')}
+            ref={node => this.inputNode = node}
+            onKeyDown={this.handleKeyDown.bind(this)}
+            onKeyUp={this.handleKeyUp.bind(this)}
+            disabled={!this.props.document.running}
+          />
         </div>
       </div>
     );
@@ -13,5 +86,11 @@ export default class DocumentEntryConsole extends Component {
 }
 
 DocumentEntryConsole.propTypes = {
-  document: PropTypes.object
+  document: PropTypes.object,
+  restart: PropTypes.func,
+  clearLog: PropTypes.func,
+  evaluate: PropTypes.func
 };
+
+export default connect(undefined, { restart, clearLog,
+  evaluate })(DocumentEntryConsole);

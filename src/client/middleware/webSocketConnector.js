@@ -14,12 +14,19 @@ function parseJSON(string) {
 export default function webSocketConnector(address) {
   let client = null;
   let sendBuffer = [];
+  let currentDocId = null;
   return store => {
     function handleCreate() {
       client.onopen = () => {
         console.log('Connected to the push notification server.');
         while (sendBuffer.length > 0) {
-          sendData(sendBuffer.shift());
+          sendData(sendBuffer.shift(), true);
+        }
+        if (currentDocId != null) {
+          sendData({
+            type: 'registerConsole',
+            data: currentDocId
+          }, true);
         }
       };
       client.onmessage = event => {
@@ -49,7 +56,8 @@ export default function webSocketConnector(address) {
               entities: {
                 documents: {
                   [data.data.id]: {
-                    console: (documentStat.console || '') + data.data.message
+                    console: ((documentStat.console || '') + data.data.message)
+                      .slice(0, 10000)
                   }
                 }
               },
@@ -67,7 +75,10 @@ export default function webSocketConnector(address) {
                 documents: {
                   [data.data.id]: {
                     errors: (documentStat.errors || []).slice(0, 10)
-                      .concat(data.data.error)
+                      .concat(data.data.error),
+                    console: ((documentStat.console || '') +
+                      (data.data.error + '\n'))
+                      .slice(0, 10000)
                   }
                 }
               },
@@ -123,13 +134,15 @@ export default function webSocketConnector(address) {
         sendData({
           type: 'registerConsole',
           data: action.payload
-        });
+        }, true);
+        currentDocId = action.payload;
       }
       if (action.type === ConsoleActions.UNREGISTER) {
         sendData({
           type: 'unregisterConsole',
           data: action.payload
-        });
+        }, true);
+        currentDocId = null;
       }
       return result;
     };

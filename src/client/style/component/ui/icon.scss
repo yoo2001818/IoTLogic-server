@@ -26,6 +26,13 @@
   margin-right: 0.3em;
 }
 
+.times-icon {
+  @include fa-icon();
+  &:before {
+    content: $fa-var-times;
+  }
+}
+
 .download-icon {
   @include fa-icon();
   vertical-align: middle;

@@ -211,6 +211,7 @@ export default class MessageServer {
       environment.runOnStart = false;
       // Do nothing for stdout.... :/
       environment.handleReset = () => {
+        this.pushServer.pushDocumentConsole(docIntId, '-- Restart --\n');
         environment.machine.stdout = msg => {
           this.pushServer.pushDocumentConsole(docIntId, msg);
         };
@@ -474,9 +475,6 @@ export default class MessageServer {
   }
   restartDocument(document) {
     debug('Restarting document ' + document.name);
-    if (document.devices == null) {
-      throw new Error('Devices value must be present (Eager loading)');
-    }
     if (document.state !== 'start') {
       return;
     }
@@ -490,6 +488,32 @@ export default class MessageServer {
     synchronizer.push({
       type: 'reset',
       data: document.payload
+    });
+  }
+  evalDocument(document, code) {
+    debug('Evaluating document ' + document.name);
+    if (document.state !== 'start') {
+      return;
+    }
+    let docIntId = document.id;
+    let docId = 'doc' + document.id;
+    let synchronizer = this.router.synchronizers[docId];
+    if (synchronizer == null) {
+      return;
+    }
+    synchronizer.push({
+      type: 'eval',
+      data: code
+    }, true)
+    .then(result => {
+      let message = (result && result.inspect && result.inspect()) || result;
+      this.pushServer.pushDocumentConsole(docIntId, message + '\n');
+    }, error => {
+      let message = error && error.message;
+      synchronizer.errors = synchronizer.errors.slice(0,
+        MAX_DOCUMENT_ERRORS);
+      synchronizer.errors.push(message);
+      this.pushServer.pushDocumentError(docIntId, message);
     });
   }
 }
