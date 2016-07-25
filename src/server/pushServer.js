@@ -13,6 +13,8 @@ export default class PushServer {
     this.userClients = {};
     this.deviceDatas = {};
     this.documentDatas = {};
+    this.documentTimers = {};
+    this.deviceTimers = {};
     this.consoleTimers = {};
     this.consoleMsg = {};
     this.messageServer = null;
@@ -138,17 +140,25 @@ export default class PushServer {
     this.consoleMsg[documentId] = message;
   }
   updateDevice(deviceId) {
-    let stat = this.messageServer.getDeviceStats({ id: deviceId });
-    this.sendDevice(deviceId, 'device', stat)
-    .then(() => {
-      if (!stat.connected) delete this.deviceDatas[deviceId];
-    });
+    if (this.deviceTimers[deviceId] != null) return;
+    this.deviceTimers[deviceId] = setTimeout(() => {
+      this.deviceTimers[deviceId] = null;
+      let stat = this.messageServer.getDeviceStats({ id: deviceId });
+      this.sendDevice(deviceId, 'device', stat)
+      .then(() => {
+        if (!stat.connected) delete this.deviceDatas[deviceId];
+      });
+    }, 50);
   }
   updateDocument(documentId) {
-    let stat = this.messageServer.getDocumentStats({ id: documentId });
-    this.sendDocument(documentId, 'document', stat)
-    .then(() => {
-      if (!stat.running) delete this.documentDatas[documentId];
-    });
+    if (this.documentTimers[documentId] != null) return;
+    this.documentTimers[documentId] = setTimeout(() => {
+      this.documentTimers[documentId] = null;
+      let stat = this.messageServer.getDocumentStats({ id: documentId });
+      this.sendDocument(documentId, 'document', stat)
+      .then(() => {
+        if (!stat.running) delete this.documentDatas[documentId];
+      });
+    }, 50);
   }
 }
