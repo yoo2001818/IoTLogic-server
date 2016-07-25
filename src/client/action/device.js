@@ -10,6 +10,7 @@ export const FETCH = 'device/fetch';
 export const DEVICE_DELETE = 'device/delete';
 export const CREATE = 'device/create';
 export const UPDATE = 'device/update';
+export const TRIGGER_REMOTE = 'device/triggerRemote';
 
 export const fetchList = createAction(FETCH_LIST,
   () => api(GET, '/devices', {}),
@@ -65,6 +66,9 @@ export const update = createAction(UPDATE,
       schema: Device
     };
   });
+export const triggerRemote = createAction(TRIGGER_REMOTE,
+  (name, group, id) => api(POST, `/devices/${name}/remote/${group}/${id}`, {}),
+  () => ({}));
 
 export function load(name) {
   return (dispatch, getState) => {

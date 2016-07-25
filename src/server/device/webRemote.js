@@ -1,7 +1,19 @@
 import { toObject } from 'r6rs';
+import EventEmitter from 'events';
 
-class WebRemote {
-  constructor(stats, notify) {
+let registry = {};
+
+export function trigger(id, group, name) {
+  if (registry[id] == null) return;
+  registry[id].forEach(remote => {
+    remote.handleEvent(group, name);
+  });
+}
+
+class WebRemote extends EventEmitter {
+  constructor(deviceId, stats, notify) {
+    super();
+    this.deviceId = deviceId;
     this.stats = stats;
     if (stats.remote == null) stats.remote = {};
     this.notify = notify;
@@ -11,6 +23,11 @@ class WebRemote {
       remove: this.remove.bind(this),
       listen: this.listen.bind(this)
     };
+    if (registry[deviceId] == null) {
+      registry[deviceId] = [];
+    }
+    registry[deviceId].push(this);
+    this.listeners = {};
   }
   button(params) {
     let args = toObject(params);
@@ -85,15 +102,37 @@ class WebRemote {
     setTimeout(() => callback([], true), 0);
   }
   listen(params, callback) {
-    // TODO
+    let args = toObject(params);
+    if (!Array.isArray(args)) {
+      throw new Error('Arguments must be a list');
+    }
+    if (args.length < 2) {
+      throw new Error('group, name must be specified');
+    }
+    let [group, name] = args;
+    let eventListener = () => callback([]);
+    this.on(group + '----' + name, eventListener);
+    return () => {
+      this.removeListener(group + '----' + name, eventListener);
+    };
+  }
+  handleEvent(group, name) {
+    this.emit(group + '----' + name);
   }
   disconnect() {
+    if (registry[this.deviceId] == null) return;
+    let index = registry[this.deviceId].indexOf(this);
+    if (index === -1) return;
+    registry[this.deviceId].splice(index, 1);
+    if (registry[this.deviceId].length === 0) {
+      delete registry[this.deviceId];
+    }
   }
 }
 
 export default function webRemote(device, stats, _, msgServer) {
   let deviceId = device.id;
-  return new WebRemote(stats, () => msgServer.notifyDeviceUpdate(
+  return new WebRemote(deviceId, stats, () => msgServer.notifyDeviceUpdate(
     deviceId
   ));
 }

@@ -43,6 +43,7 @@
   "DeviceTypePc": "PC (Node.js)",
   "DeviceTypeAndroid": "Android",
   "DeviceTypeWebRemote": "웹 리모컨",
+  "WebRemoteSection": "웹 리모컨",
   "DeviceDelete": "삭제",
   "ConfirmDeviceDeleteTitle": "장치 삭제 확인",
   "ConfirmDeviceDeleteDesc": "정말 '$1' 장치를 삭제할까요? 추가하려면 해당 장치에서 다시 설정을 해야합니다.",

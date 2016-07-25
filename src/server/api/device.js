@@ -5,6 +5,7 @@ import handleDBError from './lib/handleDBError';
 import errorCode from '../util/errorCode';
 import pick from '../util/pick';
 import pseudoDevices from '../device';
+import { trigger } from '../device/webRemote';
 import { Device, Document } from '../db';
 
 const router = new Express.Router();
@@ -130,4 +131,45 @@ router.delete('/devices/:name', ensureDevice, (req, res, next) => {
       deleted: true
     }));
   }, error => handleDBError(error, req, res, next));
+});
+
+// Web Remote specific part
+
+function ensureWebRemote(req, res, next) {
+  if (req.device.type !== 'webRemote') {
+    res.status(403);
+    res.json(errorCode.forbidden);
+    return;
+  }
+  next();
+}
+
+router.get('/devices/:name/remote', ensureDevice, ensureWebRemote,
+(req, res) => {
+  res.json(
+    (req.app.locals.messageServer.getDeviceStats(req.device) || {}).remote);
+});
+
+router.post('/devices/:name/remote/:group/:id', ensureDevice, ensureWebRemote,
+(req, res) => {
+  let stats = req.app.locals.messageServer.getDeviceStats(req.device);
+  if (stats.remote == null) throw new Error('Remote is null');
+  if (stats.remote[req.params.group] == null) {
+    res.status(404);
+    res.json(errorCode.noSuchGroup);
+    return;
+  }
+  if (stats.remote[req.params.group][req.params.id] == null) {
+    res.status(404);
+    res.json(errorCode.noSuchEntry);
+    return;
+  }
+  let component = stats.remote[req.params.group][req.params.id];
+  if (component.type !== 'button') {
+    res.status(400);
+    res.json(errorCode.notButton);
+  }
+  // Trigger the button....
+  trigger(req.device.id, req.params.group, req.params.id);
+  res.json({});
 });

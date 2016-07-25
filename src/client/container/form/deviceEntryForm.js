@@ -9,6 +9,8 @@ import { replace, push } from 'react-router-redux';
 import { Device } from '../../../validation/schema';
 import validate from '../../../validation/validate';
 
+import DeviceWebRemote from '../deviceWebRemote';
+
 import Section from '../../component/ui/section';
 import Field from '../../component/ui/field';
 import Button from '../../component/ui/button';
@@ -71,6 +73,11 @@ class DeviceEntryForm extends Component {
     return (
         <div className={classNames('device-entry-form', className)}>
           <form onSubmit={onSubmit}>
+            { !creating && device.type === 'webRemote' && (
+              <Section title={__('WebRemoteSection')}>
+                <DeviceWebRemote device={device} />
+              </Section>
+            )}
             <Section title={__('InfoSection')}>
               <Field label={__('DeviceNameLabel')}>
                 <ErrorInput type='text' placeholder={__('DeviceNameLabel')}

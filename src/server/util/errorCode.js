@@ -38,5 +38,17 @@ export default {
   pseudoDeviceToken: {
     id: 'PSEUDO_DEVICE_TOKEN',
     message: 'Attempted to access the token value of a pseudo-device.'
+  },
+  noSuchGroup: {
+    id: 'NO_SUCH_GROUP',
+    message: 'Group with specified name does not exist.'
+  },
+  noSuchEntry: {
+    id: 'NO_SUCH_ENTRY',
+    message: 'Entry with specified name does not exist.'
+  },
+  notButton: {
+    id: 'NOT_BUTTON',
+    message: 'Specified component is not a button.'
   }
 };
