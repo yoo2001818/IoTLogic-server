@@ -14,6 +14,7 @@ const MAX_DOCUMENT_ERRORS = 10;
 
 export default class MessageServer {
   constructor(server, pushServer) {
+    this.pseudoDeviceStats = {};
     this.deviceStats = {};
     this.dbClients = {};
     this.socketClients = {};
@@ -147,6 +148,9 @@ export default class MessageServer {
     this.initPseudoDevices();
   }
   getDeviceStats(device) {
+    if (this.pseudoDeviceStats[device.id] != null) {
+      return this.pseudoDeviceStats[device.id];
+    }
     let clientId = this.dbClients[device.id];
     if (clientId == null) {
       return {
@@ -192,6 +196,9 @@ export default class MessageServer {
       });
     });
   }
+  notifyDeviceUpdate(deviceId) {
+    this.pushServer.updateDevice(deviceId);
+  }
   createEnvironment(document, pseudoOnly = false) {
     if (document.state !== 'start') {
       debug('Ignoring stopped document ' + document.name);
@@ -228,7 +235,12 @@ export default class MessageServer {
       let hasPseudo = false;
       document.devices.forEach(device => {
         if (pseudoDevices[device.type] != null) {
-          let pseudoDevice = pseudoDevices[device.type](device, environment);
+          if (this.pseudoDeviceStats[device.id] == null) {
+            this.pseudoDeviceStats[device.id] = {};
+          }
+          let pseudoStats = this.pseudoDeviceStats[device.id];
+          let pseudoDevice = pseudoDevices[device.type](device, pseudoStats,
+            environment, this);
           synchronizer.pseudoDevices[device.name] = {
             id: device.id, device: pseudoDevice
           };

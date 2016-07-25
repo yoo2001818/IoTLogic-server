@@ -19,10 +19,11 @@ function stripAssociation(document) {
 function injectConnected(req, device) {
   let json = device.toJSON();
   if (pseudoDevices[json.type] != null) {
-    return Object.assign({}, json, {
-      pseudo: true,
-      documents: json.documents && json.documents.map(stripAssociation)
-    });
+    return Object.assign({}, json,
+      req.app.locals.messageServer.getDeviceStats(device), {
+        pseudo: true,
+        documents: json.documents && json.documents.map(stripAssociation)
+      });
   }
   return Object.assign({}, json,
     req.app.locals.messageServer.getDeviceStats(device), {
