@@ -294,7 +294,7 @@ cron을 IoTLogic 상에서 사용할 수 있게 해주는 패키지입니다.
 - `process/onStderr (ID) -> (데이터)` - 해당 프로세스의 stderr에서 나오는 데이터를
   수신합니다. 프로세스가 닫히면 데이터가 `()`으로 콜백이 한번 호출됩니다.
 - `process/onClose (ID) -> (코드)` - 해당 프로세스가 종료되면 호출됩니다.
-- `process/kill` (ID 시그널) -> ()` - 해당 프로세스에 kill 신호를 보냅니다. 시그널은
+- `process/kill (ID 시그널) -> ()` - 해당 프로세스에 kill 신호를 보냅니다. 시그널은
   지정되지 않으면 `SIGTERM`이 기본값으로 지정됩니다.
 
 ```scheme
@@ -312,8 +312,61 @@ cron을 IoTLogic 상에서 사용할 수 있게 해주는 패키지입니다.
 ```
 
 ### r6rs-async-io-remote
+다른 프로세스 (명령 프롬프트 등등)에서 프로그램으로 이벤트를 보낼 수 있게 해줍니다.
+`npm install -g r6rs-async-io-remote`로 명령줄 프로그램을 설치해야 사용할 수 있습니다.
+
+명령 프롬프트에서 `r6rs-remote <이벤트 이름> <인자 ...>`를 통해 이벤트를 보낼 수 있습니다.
+
+- `remote/start () -> ()` - IPC 서버를 시작합니다. `remote/listen`을 시작하기 전에
+  한번 호출해야 합니다. 콜백이 호출되지 않으므로 유의해 주세요.
+- `remote/listen 이벤트 -> (인자 ...)` - 해당 이벤트를 수신합니다. `r6rs-remote`를
+  통해 보내진 이벤트를 수신할 수 있게 해줍니다.
+
+```
+(io-exec "laptop:remote/start" '())
+(io-on "laptop:remote/listen" "test" (lambda args
+  (display args)
+  (newline)
+))
+```
 
 ### r6rs-async-io-wiring-pi
+라즈베리 파이의 GPIO 단자를 제어할 수 있게 해줍니다.
+[WiringPi](http://wiringpi.com/)를 통해 제어합니다.
+이 패키지는 wiring-pi 패키지의 wrapper입니다; 좀 더 자세한 사항은
+[API 문서](https://github.com/eugeneware/wiring-pi/blob/master/DOCUMENTATION.md#apis)를
+참조해 주세요.
+
+**이 패키지를 사용하려면 클라이언트 노드를 루트 권한으로 실행해야 합니다.**
+
+- `wiringPi/setup (mode) -> ()` - WiringPi를 초기화합니다. 모드는 wpi, gpio, sys, phys
+  중 하나입니다. 보통 `wpi`가 권장됩니다.
+- `wiringPi/pinMode (pin mode) -> ()` - 해당 핀의 모드를 설정합니다. 모드는
+  input, output, pwmOutput, gpioClock, softPwmOutput, softToneOutput중 하나입니다.
+- `wiringPi/pullUpDnControl (pin pud) -> ()` - 라즈베리 파이에는 50k옴의 풀 업/풀 다운
+  저항이 내장되어 있습니다. 이 명령은 해당 핀의 풀 업/풀 다운 저항을 설정합니다. pud는
+  off, down, up중 하나입니다.
+- `wiringPi/digitalRead (pin) -> (boolean)` - 해당 핀의 값을 읽습니다.
+- `wiringPi/digitalWrite (pin value) -> ()` - 해당 핀의 값을 씁니다. value는 `#t`나
+  `#f`중 하나입니다.
+- `wiringPi/pwmWrite (pin value) -> ()` - 해당 PWM 핀의 값을 씁니다. value는
+  0에서 1024 사이의 정수입니다. 라즈베리 파이에는 핀 1 (물리 핀 12)만이 PWM을 지원합니다.
+- `wiringPi/analogRead (pin) -> (value)` - 해당 핀의 아날로그 값을 읽습니다. 라즈베리
+  파이에서는 아날로그 핀을 지원하지 않아 사용할 수 없습니다.
+- `wiringPi/analogWrite (pin value) -> ()` - 해당 핀의 아날로그 값을 씁니다. 라즈베리
+  파이에서는 아날로그 핀을 지원하지 않아 사용할 수 없습니다.
+- `wiringPi/pulseIn (pin state) -> (length)` - 해당 핀에서 발생하는 펄스를 읽습니다.
+  state와 같은 입력이 발생해서 다시 돌아갈 때 까지의 시간이 마이크로초로 반환됩니다.
+- `wiringPi/isr (pin edgeType) -> (delta)` - 해당 핀에 인터럽트를 설정합니다.
+  edgeType는 falling, rising, both, setup중 하나입니다.
+- `wiringPi/pwmToneWrite (pin freq) -> ()` - 해당 PWM 핀에 지정한 주파수를 씁니다.
+- `wiringPi/softPwmCreate (pin value range) -> ()` - 해당 핀에 소프트웨어 PWM을
+  시작합니다. value는 현재 값, range는 최대 값입니다.
+- `wiringPi/softPwmWrite (pin value) -> ()` - 소프트웨어 PWM에 값을 씁니다.
+- `wiringPi/softPwmStop (pin) -> ()` - 소프트웨어 PWM을 멈춥니다.
+- `wiringPi/softToneCreate (pin) -> ()` - 해당 핀에 소프트웨어 톤을 시작합니다.
+- `wiringPi/softToneWrite (pin value) -> ()` - 소프트웨어 톤에 값을 씁니다.
+- `wiringPi/softToneStop (pin) -> ()` - 소프트웨어 톤을 멈춥니다.
 
 ### 패키지 만들기
 
