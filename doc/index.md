@@ -369,10 +369,66 @@ cron을 IoTLogic 상에서 사용할 수 있게 해주는 패키지입니다.
 - `wiringPi/softToneStop (pin) -> ()` - 소프트웨어 톤을 멈춥니다.
 
 ### 패키지 만들기
+다른 장치에 전혀 구애받지 않고 직접 패키지를 만들 수도 있습니다. 해당 패키지는 장치 하단의
+I/O 패키지에 등록한 경우에만 작동됩니다.
+
+패키지를 만드는 과정은 간단합니다. `r6rs-async-io`와 `r6rs`를 설치하고
+원하는 메소드를 Library에 넣으면 됩니다. 다음 코드를 참조해 주세요.
+
+[r6rs-async-io-cron 소스코드](https://github.com/yoo2001818/r6rs-async-io-library/blob/master/r6rs-async-io-cron/src/index.js)
+
+각 함수에 주어지는 params는 Scheme 환경 상에서 보낸 매개변수입니다. `r6rs` 패키지의
+`toObject`, `fromAssoc` 함수를 사용해 자바스크립트 객체로 바꿀 수 있습니다.
+
+`callback(array, finished)`는 함수 실행이 완료되면 보낼 함수입니다. 호출하면 Scheme
+환경의 콜백이 실행됩니다. `array`는 Scheme쪽에 보낼 매개변수 목록입니다. 그냥 자바스크립트 배열을
+보내면 알아서 변환해서 보내줍니다. `finished`는 함수 실행이 완전히 끝나서 다시는 callback이
+호출되지 않을 경우 `true`를 보내면 해당 콜백을 큐에서 지워 리소스를 해제합니다.
+
+각 메소드 함수는 이벤트가 취소될 때 호출되는 함수를 리턴할 수 있습니다. 여기서 이벤트 리스너를
+해제하는 등 해제 작업을 하면 됩니다. 이 취소 함수는 `io-exec`의 실행이 끝나거나, `io-cancel`로
+직접 취소하거나 인터프리터가 다시 시작될 때 호출됩니다.
+
+패키지를 완성했으면 그대로 [npm](http://npmjs.com/)에 올려 사용할 수 있습니다.
+`package.json`을 수정하고 `npm publish`를 사용해 패키지를 올리면 됩니다.
+
+패키지를 npm에 올린 뒤에는 장치 하단의 I/O 패키지에 등록하면 됩니다.
 
 ## 장치 레퍼런스
+IoTLogic에서는 PC (Node.js)가 아닌 다른 종류의 장치도 지원합니다. 하지만 이 장치들은
+내부적으로 Scheme을 실행하지 않아 서버에서 동작하게 되며 미리 정의된 동작만 수행할 수
+있습니다.
 
 ### 웹 리모컨
+![웹 리모컨](./img/webRemote.png)
+
+웹 리모컨 장치는 웹에서 직접 누를 수 있는 버튼과 텍스트 필드를 제공해서 간편하게 장치를
+원격에서도 제어할 수 있게 해줍니다.
+
+각각의 항목에는 그룹과 이름이 존재합니다. 같은 그룹의 항목은 같은 줄에서 나타납니다.
+
+- `button (group name text) -> ()` - 버튼을 생성합니다. 이미 생성된 경우, 내용을
+  바꿉니다.
+- `text (group name text) -> ()` - 텍스트 필드를 생성합니다. 이미 생성된 경우, 내용을
+  바꿉니다.
+- `remove (group name) -> ()` - 지정된 항목을 지웁니다.
+- `listen (group name) -> ()` - 지정된 항목이 실행되면 콜백을 실행합니다.
+
+```scheme
+(io-exec 'webRemote:text '(light state "불 꺼짐"))
+(io-exec 'webRemote:button '(light on "불 켜기"))
+
+(io-on 'webRemote:listen '(light on) (lambda ()
+  (io-exec 'webRemote:text '(light state "불 켜짐"))
+  (io-exec 'webRemote:remove '(light on))
+))
+```
+
+#### REST API
+웹 리모컨은 REST API를 통해서도 접근할 수 있습니다.
+
+- `GET /api/devices/<ID>/remote` - 현재 리모콘 상태를 JSON으로 출력합니다.
+- `POST /api/devices/<ID>/remote/<group>/<name>` - 해당 항목을 실행합니다.
 
 # 라이센스
 
