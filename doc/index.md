@@ -33,6 +33,9 @@
     - 패키지 만들기
   - 장치 레퍼런스
     - 웹 리모컨
+- 설치하기
+  - 클라이언트 노드 설치하기
+  - 메시징 서버 설치하기
 - 라이센스
 
 # 소개
@@ -429,6 +432,39 @@ IoTLogic에서는 PC (Node.js)가 아닌 다른 종류의 장치도 지원합니
 
 - `GET /api/devices/<ID>/remote` - 현재 리모콘 상태를 JSON으로 출력합니다.
 - `POST /api/devices/<ID>/remote/<group>/<name>` - 해당 항목을 실행합니다.
+
+# 설치하기
+
+## 클라이언트 노드 설치하기
+<a name="clientInstallHelp"></a>
+
+PC에 클라이언트 노드를 설치하려면 먼저 Node.js를 설치해야 합니다. Node.js는
+[여기서](https://nodejs.org/) 설치할 수 있습니다.
+
+Node.js 설치를 마치면 명령 프롬프트나 터미널을 열고 `npm install -g iotlogic-core`를
+입력해주세요.
+
+설치가 완료되면 설정 파일을 보관할 디렉토리로 이동해서 `IoTLogic-config`를 입력하면
+설정 마법사가 나타납니다. 만약 직접 사용할 서버를 지정하고 싶다면 `IoTLogic-config <주소>`
+로 설정할 수 있습니다.
+
+![설정 마법사](./img/pcNode.png)
+
+설정 마법사를 마친 뒤에는 설정 마법사를 실행했던 디렉토리로 이동해서 `IoTLogic`을 실행하면
+노드 접속이 완료됩니다. 만약 부팅할 때마다 자동으로 시작되게 하려면 `cron`이나
+`시작 프로그램` 등을 사용할 수 있습니다.
+
+## 메시징 서버 설치하기
+메시징 서버는 NPM에 올라가 있지 않아 [저장소](https://github.com/yoo2001818/IoTLogic-server)를
+직접 클론해야 합니다. 클론한 뒤 `npm install`으로 의존성을 설치하고, `config` 디렉토리에
+있는 설정 파일들의 뒤에서 `.example.js`를 `.js`로 바꾼 뒤 내용을 채워넣고, `gulp`를
+설치하고 실행해서 프로젝트를 빌드한 뒤 `node index.js`를 입력하면 서버가 시작됩니다.
+
+사용할 데이터베이스 종류에 맞춰 데이터베이스 모듈도 따로 설치해야 합니다.
+- PostgreSQL: `pg`, `pg-hstore`
+- MySQL / MariaDB: `mysql`
+- SQLite3: `sqlite3`
+- MSSQL: `tedious`
 
 # 라이센스
 

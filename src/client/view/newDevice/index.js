@@ -18,7 +18,9 @@ export default class NewDevice extends Component {
               {/* Hard-coded device types... Hmm. */}
               <ul className='menu-list'>
                 <li>
-                  <Link to='/new/device/pc'>{__('DeviceTypePc')}</Link>
+                  <a href='/doc#clientInstallHelp'
+                    target='_blank'
+                  >{__('DeviceTypePc')}</a>
                 </li>
                 <li>
                   <Link to='/new/device/android'>
