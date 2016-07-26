@@ -96,12 +96,10 @@ IoTLogic의 웹 프론트엔드에 대해 설명합니다.
 PC (Node.js) 유형의 장치가 아닌 경우에는 아이콘이 표시되지 않습니다.
 
 ### 만들기
-TODOTODOTODO
-TODOTODOTODO
-TODOTODOTODO
-TODOTODOTODO
-TODOTODOTODO
-<p style="font-size: 200pt;">TODO!</p>
+![장치 추가](./img/deviceAdd.png)
+
+추가 버튼을 누르면 장치 유형을 선택하는 창이 나타납니다. 누르면 유형에 따라 다른 페이지로
+분기됩니다.
 
 ### 정보 수정하기
 ![장치](./img/deviceView.png)

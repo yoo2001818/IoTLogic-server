@@ -23,11 +23,6 @@ export default class NewDevice extends Component {
                   >{__('DeviceTypePc')}</a>
                 </li>
                 <li>
-                  <Link to='/new/device/android'>
-                    {__('DeviceTypeAndroid')}
-                  </Link>
-                </li>
-                <li>
                   <Link to='/new/device/webRemote'>
                     {__('DeviceTypeWebRemote')}
                   </Link>
