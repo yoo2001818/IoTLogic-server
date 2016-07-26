@@ -73,6 +73,9 @@ export default class MessageServer {
           debug('Connecting device to document ' + document.name);
           let synchronizer = this.createEnvironment(document);
           synchronizer.handleConnect(data, clientId);
+          synchronizer.push({
+            type: 'reset'
+          });
         });
       }, error => {
         debug('Loading device documents failed');
@@ -99,6 +102,7 @@ export default class MessageServer {
           let client = synchronizer.clients[clientId];
           client = client && client.meta;
           header = (client && client.name) + ': ';
+          if (client == null) return;
         }
         synchronizer.errors = synchronizer.errors.slice(0,
           MAX_DOCUMENT_ERRORS);
@@ -122,6 +126,9 @@ export default class MessageServer {
         // Check document's client size, then destroy it if nobody is there
         let synchronizer = this.router.synchronizers[name];
         if (synchronizer == null) return;
+        synchronizer.push({
+          type: 'reset'
+        });
         if (synchronizer.clientList.length <= 1 &&
           Object.keys(synchronizer.pseudoDevices).length === 0
         ) {
@@ -254,8 +261,7 @@ export default class MessageServer {
       });
       if (hasPseudo && pseudoOnly) {
         synchronizer.push({
-          type: 'reset',
-          data: document.payload
+          type: 'reset'
         });
       }
       this.pushServer.updateDocument(document.id);
@@ -289,6 +295,9 @@ export default class MessageServer {
               id: 'pseudo_' + device.id
             })
           });
+          synchronizer.push({
+            type: 'reset'
+          });
         }
       }
       return;
@@ -302,6 +311,9 @@ export default class MessageServer {
         synchronizer.handleDisconnect(clientId);
         // TODO Meh. it'll reconnect anyway.
         // synchronizer.handleConnect(data, clientId);
+        synchronizer.push({
+          type: 'reset'
+        });
       }
     }
   }
@@ -366,6 +378,9 @@ export default class MessageServer {
       let data = device.toJSON();
       debug('Connecting device to document ' + document.name);
       synchronizer.handleConnect(data, clientId);
+    });
+    synchronizer.push({
+      type: 'reset'
     });
   }
   updateDocument(document) {
@@ -451,6 +466,9 @@ export default class MessageServer {
         synchronizer.handleDisconnect(client.id);
       }
     });
+    synchronizer.push({
+      type: 'reset'
+    });
     if (synchronizer.clientList.length <= 1 &&
       Object.keys(synchronizer.pseudoDevices).length === 0
     ) {
@@ -496,10 +514,8 @@ export default class MessageServer {
       return;
     }
     synchronizer.errors = [];
-    // TODO Remove payload if possible (core doesn't suppot empty data yet)
     synchronizer.push({
-      type: 'reset',
-      data: document.payload
+      type: 'reset'
     });
   }
   evalDocument(document, code) {

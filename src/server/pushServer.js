@@ -132,6 +132,7 @@ export default class PushServer {
       let msg = this.consoleMsg[documentId];
       this.sendDocument(documentId, 'documentConsole', { message: msg },
         client => {
+          if (client.consoles == null) return false;
           return client.consoles[documentId] === true;
         });
       delete this.consoleTimers[documentId];
