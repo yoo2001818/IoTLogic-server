@@ -12,7 +12,7 @@ function encodeText(text, param) {
   ko: '한국어'
 }; */
 
-let CURRENT_LOCALE = languages['en'];
+let CURRENT_LOCALE = languages['ko'];
 
 export function autoDetectLocale() {
   // Availability to use custom configuations.
@@ -27,7 +27,7 @@ export function autoDetectLocale() {
 }
 
 export function setLocale(lang = 'en') {
-  CURRENT_LOCALE = languages[lang] || languages['en'];
+  CURRENT_LOCALE = languages[lang] || languages['ko'];
 }
 
 export default function translate(key, ...params) {

@@ -1,0 +1,15 @@
+digraph G {
+  Server [label="IoTLogic-server"];
+  Core [label="IoTLogic-core"];
+  AsyncIo [label="r6rs-async-io"];
+  Web [label="웹 프론트엔드"];
+  MsgServer [label="메시징 서버"];
+  PCNode [label="클라이언트 노드"];
+  Web -> Server;
+  MsgServer -> Server;
+  Server -> Core;
+  PCNode -> Core;
+  Core -> locksmith;
+  Core -> AsyncIo -> r6rs;
+
+}

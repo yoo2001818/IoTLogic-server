@@ -30,11 +30,6 @@ export default class NewDevice extends Component {
                     {__('DeviceTypeWebRemote')}
                   </Link>
                 </li>
-                <li>
-                  <Link to='/new/device/pulser'>
-                    Pulser (test)
-                  </Link>
-                </li>
               </ul>
             </Section>
           </div>

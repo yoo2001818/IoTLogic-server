@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { restart, clearLog, evaluate } from '../../action/document';
+import { restart, clearLog, evaluateLog } from '../../action/document';
 
 import Button from '../../component/ui/button';
 import __ from '../../lang';
@@ -17,7 +17,7 @@ class DocumentEntryConsole extends Component {
     if (e.keyCode === 13) {
       if (e.shiftKey) return;
       if (this.inputNode.value.trim() === '') return;
-      this.props.evaluate(this.props.document, this.inputNode.value);
+      this.props.evaluateLog(this.props.document, this.inputNode.value);
       this.inputNode.value = '';
       this.handleKeyUp();
       e.preventDefault();
@@ -89,8 +89,8 @@ DocumentEntryConsole.propTypes = {
   document: PropTypes.object,
   restart: PropTypes.func,
   clearLog: PropTypes.func,
-  evaluate: PropTypes.func
+  evaluateLog: PropTypes.func
 };
 
 export default connect(undefined, { restart, clearLog,
-  evaluate })(DocumentEntryConsole);
+  evaluateLog })(DocumentEntryConsole);

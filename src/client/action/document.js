@@ -19,6 +19,7 @@ export const DELETE_WORKSPACE = 'document/deleteWorkspace';
 
 export const RESTART = 'document/restart';
 export const EVALUATE = 'document/evaluate';
+export const APPEND_LOG = 'document/appendLog';
 export const CLEAR_LOG = 'document/clearLog';
 
 export const fetchList = createAction(FETCH_LIST,
@@ -221,5 +222,27 @@ export function confirmUpdatePayload(document, code) {
         }
       ]
     }));
+  };
+}
+
+export function evaluateLog(document, code) {
+  return (dispatch, getState) => {
+    let documentStat = getState().entities.documents[document.id];
+    if (documentStat == null) return;
+    dispatch({
+      type: APPEND_LOG,
+      payload: {
+        entities: {
+          documents: {
+            [document.id]: {
+              console: ((documentStat.console || '') + '>>> ' + code + '\n')
+                .slice(0, 10000)
+            }
+          }
+        },
+        result: document.id
+      }
+    });
+    return dispatch(evaluate(document, code));
   };
 }
