@@ -1,7 +1,6 @@
 import { DefaultResolver } from 'r6rs-async-io';
 import { SYMBOL, STRING, PAIR } from 'r6rs';
-
-const NOOP = () => {};
+import { NOOP } from 'iotlogic-core';
 
 function checkValidity(data) {
   if (data == null ||

@@ -84,7 +84,7 @@ export default class MessageServer {
       });
     });
     this.router.on('error', (name, err, clientId, fromClient) => {
-      console.log((err && err.stack) || err);
+      // console.log((err && err.stack) || err);
       // If name is null, it's a device error. If not, it's a document error.
       debug('Handling error from ' + name);
       if (fromClient && name == null) {

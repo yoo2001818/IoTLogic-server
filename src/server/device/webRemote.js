@@ -29,7 +29,7 @@ class WebRemote extends EventEmitter {
     registry[deviceId].push(this);
     this.listeners = {};
   }
-  button(params) {
+  button(params, callback) {
     let args = toObject(params);
     if (!Array.isArray(args)) {
       throw new Error('Arguments must be a list');
@@ -41,11 +41,16 @@ class WebRemote extends EventEmitter {
     if (this.stats.remote[group] == null) {
       this.stats.remote[group] = {};
     }
+    let creator = this.stats.remote[group][name] == null;
     this.stats.remote[group][name] = {
       type: 'button',
       text, extra
     };
     this.notify();
+    if (!creator) {
+      setTimeout(() => callback([], true), 0);
+      return;
+    }
     return () => {
       if (this.stats.remote[group] != null) {
         delete this.stats.remote[group][name];
@@ -56,7 +61,7 @@ class WebRemote extends EventEmitter {
       }
     };
   }
-  text(params) {
+  text(params, callback) {
     let args = toObject(params);
     if (!Array.isArray(args)) {
       throw new Error('Arguments must be a list');
@@ -68,11 +73,16 @@ class WebRemote extends EventEmitter {
     if (this.stats.remote[group] == null) {
       this.stats.remote[group] = {};
     }
+    let creator = this.stats.remote[group][name] == null;
     this.stats.remote[group][name] = {
       type: 'text',
       text, extra
     };
     this.notify();
+    if (!creator) {
+      setTimeout(() => callback([], true), 0);
+      return;
+    }
     return () => {
       if (this.stats.remote[group] != null) {
         delete this.stats.remote[group][name];
