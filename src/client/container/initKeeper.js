@@ -24,6 +24,6 @@ InitKeeper.propTypes = {
 
 export default connect(
   state => ({
-    loaded: state.init.loaded,
+    loaded: state.init.loaded
   })
 )(InitKeeper);

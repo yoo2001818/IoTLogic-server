@@ -9,6 +9,7 @@ import webSocketVerify from './util/webSocketVerify';
 import logging from './util/logging';
 import errorCode from './util/errorCode';
 import serveStatic from 'serve-static';
+import compression from 'compression';
 
 import networkConfig from '../../config/network.config';
 
@@ -46,11 +47,13 @@ if (__DEVELOPMENT__) {
   const webpackConfig = require('../../webpack.config.js');
   let compiler = webpack(webpackConfig);
   app.use(webpackHotMiddleware(compiler));
+  app.use(compression());
   app.use(webpackDevMiddleware(compiler, {
     noInfo: true,
     publicPath: '/assets'
   }));
 } else {
+  app.use(compression());
   app.use('/assets', serveStatic('./dist'));
 }
 
@@ -69,6 +72,7 @@ app.use((req, res) => {
           content="width=device-width, initial-scale=1, maximum-scale=1">
         <meta charset="UTF-8">
         <title>IoTLogic</title>
+        <link rel="stylesheet" type="text/css" href="/assets/bundle.css">
       </head>
       <body>
         <script src="/assets/bundle.js"></script>

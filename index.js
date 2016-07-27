@@ -5,8 +5,12 @@ global.__CLIENT__ = false;
 global.__DEVELOPMENT__ = !PRODUCTION;
 global.__DEVTOOLS__ = false;
 
-// Support ES6
-require('babel-core/register');
+if (PRODUCTION) {
+  require('./lib/server');
+} else {
+  // Support ES6
+  require('babel-core/register');
 
-// Just simply link to src/server.js
-require('./src/server');
+  // Just simply link to src/server
+  require('./src/server');
+}

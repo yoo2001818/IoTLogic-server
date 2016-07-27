@@ -10,7 +10,8 @@ var plugins = [
     __CLIENT__: true,
     __SERVER__: false,
     __DEVELOPMENT__: process.env.NODE_ENV !== 'production',
-    __DEVTOOLS__: false
+    __DEVTOOLS__: false,
+    'process.env.NODE_ENV': '\"' + process.env.NODE_ENV + '\"'
   }),
   new ExtractTextPlugin('bundle.css', {
     disable: process.env.NODE_ENV !== 'production'
