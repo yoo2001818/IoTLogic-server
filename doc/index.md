@@ -36,6 +36,9 @@
 - 설치하기
   - 클라이언트 노드 설치하기
   - 메시징 서버 설치하기
+- 예제
+  - 원격으로 컴퓨터 종료하기
+  - 버튼 눌리면 LED 토글하기
 - 라이센스
 
 # 소개
@@ -463,6 +466,57 @@ Node.js 설치를 마치면 명령 프롬프트나 터미널을 열고 `npm inst
 - MySQL / MariaDB: `mysql`
 - SQLite3: `sqlite3`
 - MSSQL: `tedious`
+
+# 예제
+
+## 원격으로 컴퓨터 종료하기
+
+- webRemote - 웹 리모컨 장치
+- computer - PC (Node.js), `r6rs-async-io-process`
+
+```scheme
+(io-exec 'webRemote:button '(computer off "컴퓨터 끄기"))
+
+(io-on 'webRemote:listen '(computer off) (lambda ()
+  (io-exec 'computer:process/exec "shutdown -s -t 0")
+))
+```
+
+## 버튼 눌리면 LED 토글하고 알림 보내기
+
+- rpi - 라즈베리 파이 (Node.js), `r6rs-async-io-wiring-pi`
+- computer - PC (Node.js), `r6rs-async-io-node-notifier`
+
+```scheme
+(define INPUT-PIN 15)
+(define LED-PIN 16)
+
+(io-exec 'rpi:wiringPi/setup '(wpi))
+(io-exec 'rpi:wiringPi/pinMode `(,INPUT-PIN input))
+(io-exec 'rpi:wiringPi/pinMode `(,LED-PIN output))
+
+; Turn off the LED for initialization
+(io-exec 'rpi:wiringPi/digitalWrite (list LED-PIN #f))
+
+(let ((pressed #f) (ledOn #f))
+  (io-on 'rpi:timer 50 (lambda ()
+    (io-exec 'rpi:wiringPi/digitalRead (list INPUT-PIN) (lambda (status)
+      (if (not (eq? pressed status)) (begin
+        (set! pressed status)
+        (if status
+          (begin
+            (set! ledOn (not ledOn))
+            (io-exec 'rpi:wiringPi/digitalWrite (list LED-PIN ledOn))
+            (io-exec 'computer:notifier/send
+              (if ledOn "LED turned on" "LED turned off"))
+          )
+        )
+      ))
+    ))
+  ))
+)
+
+```
 
 # 라이센스
 
