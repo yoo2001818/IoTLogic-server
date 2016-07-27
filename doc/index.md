@@ -431,7 +431,7 @@ IoTLogic에서는 PC (Node.js)가 아닌 다른 종류의 장치도 지원합니
 #### REST API
 웹 리모컨은 REST API를 통해서도 접근할 수 있습니다.
 
-- `GET /api/devices/<ID>/remote` - 현재 리모콘 상태를 JSON으로 출력합니다.
+- `GET /api/devices/<ID>/remote` - 현재 리모컨 상태를 JSON으로 출력합니다.
 - `POST /api/devices/<ID>/remote/<group>/<name>` - 해당 항목을 실행합니다.
 
 # 설치하기
