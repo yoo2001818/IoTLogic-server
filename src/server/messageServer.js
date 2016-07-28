@@ -138,6 +138,8 @@ export default class MessageServer {
             synchronizer.pseudoDevices[key].disconnect();
           }
           synchronizer.stop();
+          // Clean up remaining events
+          synchronizer.machine.ioManager.cancelAll();
           this.router.removeSynchronizer(name);
           this.pushServer.updateDocument(parseInt(name.slice(3)));
         }
@@ -341,6 +343,8 @@ export default class MessageServer {
             debug('Removing synchronizer ' + key);
             // Remove synchronizer
             synchronizer.stop();
+            // Clean up remaining events
+            synchronizer.machine.ioManager.cancelAll();
             this.router.removeSynchronizer(key);
             this.pushServer.updateDocument(parseInt(key.slice(3)));
           }
@@ -475,6 +479,8 @@ export default class MessageServer {
       debug('Removing synchronizer ' + docId);
       // Remove synchronizer
       synchronizer.stop();
+      // Clean up remaining events
+      synchronizer.machine.ioManager.cancelAll();
       this.router.removeSynchronizer(docId);
     }
     this.pushServer.updateDocument(document.id);
@@ -499,6 +505,8 @@ export default class MessageServer {
     }
     // Remove synchronizer
     synchronizer.stop();
+    // Clean up remaining events
+    synchronizer.machine.ioManager.cancelAll();
     // Good bye
     this.router.removeSynchronizer(docId);
     this.pushServer.updateDocument(docId);
