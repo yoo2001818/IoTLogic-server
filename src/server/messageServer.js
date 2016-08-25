@@ -135,7 +135,7 @@ export default class MessageServer {
           debug('Removing synchronizer ' + name);
           // Remove synchronizer
           for (let key in synchronizer.pseudoDevices) {
-            synchronizer.pseudoDevices[key].disconnect();
+            synchronizer.pseudoDevices[key].device.disconnect();
           }
           synchronizer.stop();
           // Clean up remaining events
@@ -501,7 +501,7 @@ export default class MessageServer {
       }
     });
     for (let key in synchronizer.pseudoDevices) {
-      synchronizer.pseudoDevices[key].disconnect();
+      synchronizer.pseudoDevices[key].device.disconnect();
     }
     // Remove synchronizer
     synchronizer.stop();
