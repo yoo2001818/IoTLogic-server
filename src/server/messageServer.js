@@ -418,7 +418,12 @@ export default class MessageServer {
         if (synchronizer.pseudoDevices[device.name] != null) return;
         debug('Connecting pseudo device to document ' + document.name);
         // Create pseudodevice
-        let pseudoDevice = pseudoDevices[device.type](device, environment);
+        if (this.pseudoDeviceStats[device.id] == null) {
+          this.pseudoDeviceStats[device.id] = {};
+        }
+        let pseudoStats = this.pseudoDeviceStats[device.id];
+        let pseudoDevice = pseudoDevices[device.type](device, pseudoStats,
+          environment, this);
         synchronizer.pseudoDeviceIdRef[device.id] = device.name;
         synchronizer.pseudoDevices[device.name] = {
           id: device.id, device: pseudoDevice
