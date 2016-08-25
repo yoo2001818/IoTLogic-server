@@ -3,7 +3,8 @@
 export default function entities(state = {
   users: {},
   documents: {},
-  devices: {}
+  devices: {},
+  documentPush: {}
 }, action) {
   if (action.payload && action.payload.entities) {
     const newState = Object.assign({}, state);

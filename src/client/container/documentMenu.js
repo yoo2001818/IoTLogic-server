@@ -20,9 +20,10 @@ class DocumentMenu extends Component {
         </div>
         <ul className='subcategory'>
           {
-            this.props.list.map(document => (
+            this.props.list.map((document, i) => (
               <li key={document.id}>
-                <DocumentSpan document={document} />
+                <DocumentSpan document={document}
+                  documentPush={this.props.pushList[i]} />
               </li>
             ))
           }
@@ -46,11 +47,13 @@ DocumentMenu.propTypes = {
   user: PropTypes.object,
   loading: PropTypes.bool,
   list: PropTypes.array,
+  pushList: PropTypes.array,
   loadList: PropTypes.func
 };
 
 export default connect(state => ({
   user: state.entities.users[state.user.username],
   loading: state.document.load && state.document.load.loading,
-  list: (state.document.list || []).map(v => state.entities.documents[v])
+  list: (state.document.list || []).map(v => state.entities.documents[v]),
+  pushList: (state.document.list || []).map(v => state.entities.documentPush[v])
 }), { loadList })(DocumentMenu);

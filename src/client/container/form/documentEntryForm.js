@@ -16,6 +16,7 @@ import ErrorInput from '../../component/ui/errorInput';
 import DropDown from '../../component/ui/dropDown';
 import SelectInput from '../../component/ui/selectInput';
 import DeviceList from '../deviceList';
+import DocumentErrorList from '../documentErrorList';
 
 import __ from '../../lang';
 
@@ -123,12 +124,8 @@ class DocumentEntryForm extends Component {
                 </div>
               )}
             </Section>
-            {!creating && document.errors && document.errors.length > 0 && (
-              <Section title={__('DocumentErrorSection')}>
-                <code><pre className='error-log'>
-                  {document.errors.join('\n')}
-                </pre></code>
-              </Section>
+            {!creating && (
+              <DocumentErrorList document={document} />
             )}
             {!creating && (
               <Section title={__('DocumentSourceSection')}>

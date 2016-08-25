@@ -48,13 +48,14 @@ export default function webSocketConnector(address) {
             }
           });
         case 'documentConsole': {
-          let documentStat = store.getState().entities.documents[data.data.id];
-          if (documentStat == null) return;
+          let documentStat = store.getState().entities.
+            documentPush[data.data.id];
+          if (documentStat == null) documentStat = {};
           return store.dispatch({
             type: PUSH,
             payload: {
               entities: {
-                documents: {
+                documentPush: {
                   [data.data.id]: {
                     console: ((documentStat.console || '') + data.data.message)
                       .slice(0, 10000)
@@ -66,13 +67,14 @@ export default function webSocketConnector(address) {
           });
         }
         case 'documentError': {
-          let documentStat = store.getState().entities.documents[data.data.id];
-          if (documentStat == null) return;
+          let documentStat = store.getState().entities.
+            documentPush[data.data.id];
+          if (documentStat == null) documentStat = {};
           return store.dispatch({
             type: PUSH,
             payload: {
               entities: {
-                documents: {
+                documentPush: {
                   [data.data.id]: {
                     errors: (documentStat.errors || []).slice(0, 10)
                       .concat(data.data.error),

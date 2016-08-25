@@ -227,13 +227,13 @@ export function confirmUpdatePayload(document, code) {
 
 export function evaluateLog(document, code) {
   return (dispatch, getState) => {
-    let documentStat = getState().entities.documents[document.id];
-    if (documentStat == null) return;
+    let documentStat = getState().entities.documentPush[document.id];
+    if (documentStat == null) documentStat = {};
     dispatch({
       type: APPEND_LOG,
       payload: {
         entities: {
-          documents: {
+          documentPush: {
             [document.id]: {
               console: ((documentStat.console || '') + '>>> ' + code + '\n')
                 .slice(0, 10000)

@@ -67,7 +67,8 @@ class DocumentEntryConsole extends Component {
           ref={node => this.consoleNode = node}
         >
           <pre>
-            { (this.props.document.console) || '' }
+            { (this.props.documentPush && this.props.documentPush.console)
+            || '' }
           </pre>
         </div>
         <div className='input'>
@@ -86,11 +87,14 @@ class DocumentEntryConsole extends Component {
 }
 
 DocumentEntryConsole.propTypes = {
+  documentPush: PropTypes.object,
   document: PropTypes.object,
   restart: PropTypes.func,
   clearLog: PropTypes.func,
   evaluateLog: PropTypes.func
 };
 
-export default connect(undefined, { restart, clearLog,
+export default connect((state, props) => ({
+  documentPush: state.entities.documentPush[props.document.id]
+}), { restart, clearLog,
   evaluateLog })(DocumentEntryConsole);

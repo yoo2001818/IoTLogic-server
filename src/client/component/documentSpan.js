@@ -4,7 +4,9 @@ import { Link } from 'react-router';
 
 export default class DocumentSpan extends Component {
   render() {
-    const { id, name, state, running, errors } = this.props.document;
+    const { id, name, state, running } = this.props.document;
+    let errors = (this.props.documentPush && this.props.documentPush.errors) ||
+      this.props.document.errors;
     return (
       <Link className='document-span'
         activeClassName='active'
@@ -23,5 +25,6 @@ export default class DocumentSpan extends Component {
 }
 
 DocumentSpan.propTypes = {
-  document: PropTypes.object
+  document: PropTypes.object,
+  documentPush: PropTypes.object
 };
