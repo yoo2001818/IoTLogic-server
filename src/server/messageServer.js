@@ -495,7 +495,7 @@ export default class MessageServer {
     let docId = 'doc' + document.id;
     let synchronizer = this.router.synchronizers[docId];
     if (synchronizer == null) return;
-    synchronizer.clientList.forEach(client => {
+    synchronizer.clientList.slice().forEach(client => {
       if (client.id !== this.connector.getClientId()) {
         // Disconnect node
         debug('Disconnecting client ' + client.id);
@@ -514,7 +514,7 @@ export default class MessageServer {
     synchronizer.machine.ioManager.cancelAll();
     // Good bye
     this.router.removeSynchronizer(docId);
-    this.pushServer.updateDocument(docId);
+    this.pushServer.updateDocument(document.id);
   }
   restartDocument(document) {
     debug('Restarting document ' + document.name);
